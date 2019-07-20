@@ -2,10 +2,6 @@ import React, { Component } from 'react';
 
 class Header extends Component {
 
-    constructor(props) {
-        super(props);
-    }
-
     render() {
         return (
             <div>
@@ -41,6 +37,8 @@ class Header extends Component {
                         </div>
                     </div>
                 </nav>
+                <br></br>
+                <br></br>
             </div>
         );
     }

@@ -1,14 +1,14 @@
 import React, { Component } from 'react';
 
-class MainDashboard extends Component {
+class SalesRecord extends Component {
 
     render() {
         return (
             <div>
-                <h1 className="title">Interfaz principal</h1>
+                <h1 className="title">Registro ventas</h1>
             </div>
         );
     }
 }
 
-export default MainDashboard;
+export default SalesRecord;

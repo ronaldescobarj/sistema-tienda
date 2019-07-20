@@ -1,14 +1,14 @@
 import React, { Component } from 'react';
 
-class MainDashboard extends Component {
+class Inventory extends Component {
 
     render() {
         return (
             <div>
-                <h1 className="title">Interfaz principal</h1>
+                <h1 className="title">Inventario</h1>
             </div>
         );
     }
 }
 
-export default MainDashboard;
+export default Inventory;
