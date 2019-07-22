@@ -19,12 +19,20 @@ class Firebase {
         this.db = app.firestore();
     }
 
+    getItems() {
+        return this.db.collection("inventory").get();
+    }
+
+    getItemById(id) {
+        return this.db.collection("inventory").doc(id).get();
+    }
+
     addItem(item) {
         return this.db.collection("inventory").add(item);
     }
 
-    getItems() {
-        return this.db.collection("inventory").get();
+    updateItem(item, id) {
+        return this.db.collection("inventory").doc(id).set(item);
     }
 
     createUser(email, password) {
