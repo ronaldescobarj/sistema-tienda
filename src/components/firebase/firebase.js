@@ -27,22 +27,33 @@ class Firebase {
         return this.db.collection("inventory").get();
     }
 
-    createUser = (email, password) =>
+    createUser(email, password) {
         this.auth.createUserWithEmailAndPassword(email, password);
+    }
 
-    login = (email, password) =>
+    login(email, password) {
         this.auth.signInWithEmailAndPassword(email, password);
+    }
 
-    logout = () => this.auth.signOut();
+    logout() {
+        this.auth.signOut();
+    }
 
-    resetPassword = email => this.auth.sendPasswordResetEmail(email);
+    resetPassword(email) {
+        this.auth.sendPasswordResetEmail(email);
+    }
 
-    updatePassword = password =>
+    updatePassword(password) {
         this.auth.currentUser.updatePassword(password);
+    }
 
-    getUserById = uid => this.db.ref(`users/${uid}`);
+    getUserById(uid) {
+        this.db.ref(`users/${uid}`);
+    }
 
-    getUsers = () => this.db.ref('users');
+    getUsers() {
+        this.db.ref('users');
+    }
 }
 
 export default Firebase;
