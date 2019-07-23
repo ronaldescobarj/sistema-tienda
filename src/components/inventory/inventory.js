@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import { withFirebase } from '../firebase';
+import { BrowserRouter as Router, Route, Link } from "react-router-dom";
 
 const Inventory = () => (
     <div>
@@ -15,10 +16,18 @@ class InventoryTableBase extends Component {
         this.state = {
             items: [],
             total: 0,
+            modalClass: "modal",
+            idToDelete: ''
         }
+        this.openModal = this.openModal.bind(this);
+        this.deleteItem = this.deleteItem.bind(this);
     }
 
     componentDidMount() {
+        this.getData();
+    }
+
+    getData() {
         const self = this;
         let items = [];
         let total = 0;
@@ -31,6 +40,21 @@ class InventoryTableBase extends Component {
             });
             self.setState({ items: items, total: total });
         })
+    }
+
+    openModal(id) {
+        this.setState({ modalClass: "modal is-active", idToDelete: id })
+    }
+
+    deleteItem() {
+        this.props.firebase.deleteItem(this.state.idToDelete).then(() => {
+            this.getData();
+            this.closeModal();
+        })
+    }
+
+    closeModal() {
+        this.setState({ modalClass: "modal", idToDelete: '' })
     }
 
     renderItems() {
@@ -49,6 +73,20 @@ class InventoryTableBase extends Component {
                     <td>
                         {item.amount}
                     </td>
+                    <td>
+                        <div className="field has-addons">
+                            <p className="control">
+                                <Link className="button" to={"/item/" + item._id}>
+                                    Ver/Editar
+                                </Link>
+                            </p>
+                            <p className="control">
+                                <button onClick={() => this.openModal(item._id)} className="button is-danger">
+                                    Eliminar
+                                </button>
+                            </p>
+                        </div>
+                    </td>
                 </tr>
             )
         });
@@ -65,6 +103,7 @@ class InventoryTableBase extends Component {
                             <th>Código</th>
                             <th>Color</th>
                             <th>Cantidad</th>
+                            <th>Acciones</th>
                         </tr>
                     </thead>
                     <tfoot>
@@ -73,12 +112,30 @@ class InventoryTableBase extends Component {
                             <th></th>
                             <th>Total</th>
                             <th>{this.state.total}</th>
+                            <th></th>
                         </tr>
                     </tfoot>
                     <tbody>
                         {this.renderItems()}
                     </tbody>
                 </table>
+
+                <div className={this.state.modalClass}>
+                    <div className="modal-background"></div>
+                    <div className="modal-card">
+                        <header className="modal-card-head">
+                            <p className="modal-card-title">Eliminar item</p>
+                        </header>
+                        <section className="modal-card-body">
+                            ¿Está seguro de que desea eliminar el elemento?
+                        </section>
+                        <footer className="modal-card-foot">
+                            <button className="button is-danger" onClick={this.deleteItem}>Eliminar</button>
+                            <button className="button">Cancelar</button>
+                        </footer>
+                    </div>
+                </div>
+
             </div>
         );
     }

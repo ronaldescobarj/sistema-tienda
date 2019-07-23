@@ -35,6 +35,10 @@ class Firebase {
         return this.db.collection("inventory").doc(id).set(item);
     }
 
+    deleteItem(id) {
+        return this.db.collection("inventory").doc(id).delete();
+    }
+
     createUser(email, password) {
         this.auth.createUserWithEmailAndPassword(email, password);
     }
