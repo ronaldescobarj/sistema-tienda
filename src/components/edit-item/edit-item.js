@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import { withFirebase } from '../firebase';
+import { BrowserRouter as Router, Route, Link, Redirect } from "react-router-dom";
 
 const EditItem = ({ match }) => (
     <div>
@@ -14,10 +15,12 @@ class EditItemFormBase extends Component {
             name: '',
             code: '',
             color: '',
-            amount: 0
+            amount: 0,
+            redirect: false
         };
         this.onSubmit = this.onSubmit.bind(this);
         this.onChange = this.onChange.bind(this);
+        this.redirectToInventory = this.redirectToInventory.bind(this);
     }
 
     componentDidMount() {
@@ -32,10 +35,14 @@ class EditItemFormBase extends Component {
         });
     }
 
+    redirectToInventory() {
+        this.setState({ redirect: true })
+    }
+
     onSubmit(event) {
         event.preventDefault();
         this.props.firebase.updateItem(this.state, this.props.itemId).then(() => {
-            console.log("exito");
+            this.redirectToInventory();
         })
     }
 
@@ -45,6 +52,12 @@ class EditItemFormBase extends Component {
 
 
     render() {
+        const { redirect } = this.state;
+
+        if (redirect) {
+            return <Redirect to='/inventario' />;
+        }
+
         return (
             <form onSubmit={this.onSubmit}>
                 <div className="field">
@@ -77,10 +90,10 @@ class EditItemFormBase extends Component {
                 </div>
                 <div className="field is-grouped">
                     <div className="control">
-                        <button type="submit" className="button is-link">Submit</button>
+                        <button type="submit" className="button is-link">Guardar</button>
                     </div>
                     <div className="control">
-                        <button type="submit" className="button is-text">Cancel</button>
+                        <button onClick={this.redirectToInventory} className="button is-text">Cancelar</button>
                     </div>
                 </div>
             </form>

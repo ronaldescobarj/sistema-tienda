@@ -1,10 +1,11 @@
 import React, { Component } from 'react';
 import { withFirebase } from '../firebase';
-import { BrowserRouter as Router, Route, Link } from "react-router-dom";
+import { BrowserRouter as Router, Route, Link, Redirect } from "react-router-dom";
 
 const Inventory = () => (
     <div>
         <h1 className="title">Inventario</h1>
+        <Link className="button" to="/nuevo-item">Nuevo item</Link>
         <InventoryTable />
     </div>
 );
@@ -20,6 +21,7 @@ class InventoryTableBase extends Component {
             idToDelete: ''
         }
         this.openModal = this.openModal.bind(this);
+        this.closeModal = this.closeModal.bind(this);
         this.deleteItem = this.deleteItem.bind(this);
     }
 
@@ -131,7 +133,7 @@ class InventoryTableBase extends Component {
                         </section>
                         <footer className="modal-card-foot">
                             <button className="button is-danger" onClick={this.deleteItem}>Eliminar</button>
-                            <button className="button">Cancelar</button>
+                            <button className="button" onClick={this.closeModal}>Cancelar</button>
                         </footer>
                     </div>
                 </div>
