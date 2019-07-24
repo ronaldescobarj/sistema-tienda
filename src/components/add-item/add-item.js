@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { withFirebase } from '../firebase';
-import { BrowserRouter as Redirect } from "react-router-dom";
+import { Redirect } from "react-router-dom";
 
 const AddItem = () => (
     <div>
@@ -24,8 +24,14 @@ class AddItemFormBase extends Component {
     }
 
     onSubmit(event) {
+        let item = {
+            name: this.state.name,
+            code: this.state.code,
+            color: this.state.color,
+            amount: parseInt(this.state.amount)
+        };
         event.preventDefault();
-        this.props.firebase.addItem(this.state).then((response) => {
+        this.props.firebase.addItem(item).then((response) => {
             this.redirectToInventory();
         })
     }

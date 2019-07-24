@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { withFirebase } from '../firebase';
-import { BrowserRouter as Redirect } from "react-router-dom";
+import { Redirect } from "react-router-dom";
 
 const EditItem = ({ match }) => (
     <div>
@@ -40,8 +40,14 @@ class EditItemFormBase extends Component {
     }
 
     onSubmit(event) {
+        let item = {
+            name: this.state.name,
+            code: this.state.code,
+            color: this.state.color,
+            amount: parseInt(this.state.amount)
+        };
         event.preventDefault();
-        this.props.firebase.updateItem(this.state, this.props.itemId).then(() => {
+        this.props.firebase.updateItem(item, this.props.itemId).then(() => {
             this.redirectToInventory();
         })
     }

@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { withFirebase } from '../firebase';
-import { BrowserRouter as Link } from "react-router-dom";
+import { Link } from "react-router-dom";
 
 const Inventory = () => (
     <div>
