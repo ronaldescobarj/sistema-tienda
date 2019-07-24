@@ -18,11 +18,14 @@ class InventoryTableBase extends Component {
             items: [],
             total: 0,
             modalClass: "modal",
-            idToDelete: ''
+            idToDelete: '',
+            parameterToSortBy: 'name',
+            sortDirection: 'ascendant'
         }
         this.openModal = this.openModal.bind(this);
         this.closeModal = this.closeModal.bind(this);
         this.deleteItem = this.deleteItem.bind(this);
+        this.sort = this.sort.bind(this);
     }
 
     componentDidMount() {
@@ -52,7 +55,24 @@ class InventoryTableBase extends Component {
         this.props.firebase.deleteItem(this.state.idToDelete).then(() => {
             this.getData();
             this.closeModal();
-        })
+        });
+    }
+
+    sort(event) {
+        this.setState({ [event.target.name]: event.target.value }, () => {
+            console.log(this.state);
+            let parameter = this.state.parameterToSortBy;
+            let isAscendant = this.state.sortDirection === 'ascendant';
+            let items = this.state.items;
+            items.sort((first, second) => {
+                if (first[parameter] < second[parameter])
+                    return isAscendant ? -1 : 1;
+                if (first[parameter] > second[parameter])
+                    return isAscendant ? 1 : -1;
+                return 0;
+            });
+            this.setState({ items: items});
+        });
     }
 
     closeModal() {
@@ -98,6 +118,17 @@ class InventoryTableBase extends Component {
     render() {
         return (
             <div>
+                <select name="parameterToSortBy" value={this.state.parameterToSortBy}
+                onChange={this.sort}>
+                    <option value="name">Nombre</option>
+                    <option value="code">Código</option>
+                    <option value="color">Color</option>
+                    <option value="amount">Cantidad</option>
+                </select>
+                <select name="sortDirection" value={this.state.sortDirection} onChange={this.sort}>
+                    <option value="ascendant">Ascendente</option>
+                    <option value="descendant">Descendente</option>
+                </select>
                 <table className="table">
                     <thead>
                         <tr>
