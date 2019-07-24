@@ -5,7 +5,7 @@ class Header extends Component {
     render() {
         return (
             <div>
-                <nav className="navbar is-fixed-top" role="navigation" aria-label="main navigation">
+                <nav className="navbar is-fixed-top is-primary" role="navigation" aria-label="main navigation">
                     <div className="navbar-brand">
                         <img src="https://bulma.io/images/bulma-logo.png" alt="xd" width="112" height="28"></img>
                         <a href="/" role="button" className="navbar-burger burger" aria-label="menu" aria-expanded="false" data-target="navbarBasicExample">
