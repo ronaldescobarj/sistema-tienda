@@ -1,11 +1,12 @@
 import React, { Component } from 'react';
+import { Link } from "react-router-dom";
 
 class Header extends Component {
 
     render() {
         return (
             <div>
-                <nav className="navbar is-fixed-top is-primary" role="navigation" aria-label="main navigation">
+                <nav className="navbar is-fixed-top is-link" role="navigation" aria-label="main navigation">
                     <div className="navbar-brand">
                         <img src="https://bulma.io/images/bulma-logo.png" alt="xd" width="112" height="28"></img>
                         <a href="/" role="button" className="navbar-burger burger" aria-label="menu" aria-expanded="false" data-target="navbarBasicExample">
@@ -17,21 +18,22 @@ class Header extends Component {
                     <div id="navbarBasicExample" className="navbar-menu">
                         <div className="navbar-start">
                             <div className="navbar-item">
-                                <a href="/" className="button is-light">Inventario</a>
+                                <Link to="/inventario" className="button is-light is-outlined">Inventario</Link>
                             </div>
                             <div className="navbar-item">
-                                <a href="/" className="button is-light">Registro de ventas</a>
+                                <Link to="/registro-ventas" className="button is-light is-outlined">Registro de ventas</Link>
                             </div>
                         </div>
                         <div className="navbar-end">
                             <div className="navbar-item">
                                 <div className="buttons">
-                                    <a href="/" className="button is-primary">
-                                        Cerrar sesión
-                                    </a>
-                                    <a href="/" className="button is-primary">
+                                    <Link to="/edit-account" className="button is-primary is-inverted is-outlined">
                                         Editar cuenta
-                                    </a>
+                                    </Link>
+                                    <button className="button is-danger is-inverted">
+                                        Cerrar sesión
+                                    </button>
+                                    
                                 </div>
                             </div>
                         </div>

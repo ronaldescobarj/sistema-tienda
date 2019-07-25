@@ -4,7 +4,7 @@ import { Link } from "react-router-dom";
 
 const Inventory = () => (
     <div>
-        <section className="hero is-small is-info">
+        <section className="hero is-small is-primary">
             <div className="hero-body">
                 <div className="container has-text-centered">
                     <h1 className="title">
@@ -131,13 +131,13 @@ class InventoryTableBase extends Component {
                         <Link className="button is-success" to="/nuevo-item">Añadir nuevo item</Link>
                     </div>
                     <div className="column has-text-centered">
-                        <div className="field is-horizontal has-text-centered">
-                            <div className="field-label">
+                        <div className="columns is-mobile">
+                            <div className="column has-text-right">
                                 <label className="label">Ordenar por</label>
                             </div>
-                            <div className="field-body">
+                            <div className="column has-text-left">
                                 <div className="field">
-                                    <div className="control">
+                                    <div className="control has-text-left">
                                         <div className="select is-primary">
                                             <select name="parameterToSortBy" value={this.state.parameterToSortBy}
                                                 onChange={this.sort}>
@@ -153,13 +153,13 @@ class InventoryTableBase extends Component {
                         </div>
                     </div>
                     <div className="column">
-                        <div className="field is-horizontal">
-                            <div className="field-label">
+                        <div className="columns is-mobile">
+                            <div className="column has-text-right">
                                 <label className="label">De manera</label>
                             </div>
-                            <div className="field-body">
-                                <div className="field">
-                                    <div className="control">
+                            <div className="column has-text-left">
+                                <div className="field has-text-left">
+                                    <div className="control has-text-left">
                                         <div className="select is-info">
                                             <select name="sortDirection" value={this.state.sortDirection} onChange={this.sort}>
                                                 <option value="ascendant">Ascendente</option>
@@ -173,10 +173,10 @@ class InventoryTableBase extends Component {
                     </div>
                 </div>
                 <div className="columns is-mobile is-centered">
-                    <div className="column is-three-fifths">
-                        <table className="table">
+                    <div className="column is-four-fifths">
+                        <table className="table is-striped is-fullwidth">
                             <thead>
-                                <tr>
+                                <tr className="is-selected is-link">
                                     <th>Nombre</th>
                                     <th>Código</th>
                                     <th>Color</th>
