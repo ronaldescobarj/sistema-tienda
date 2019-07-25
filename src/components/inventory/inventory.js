@@ -23,17 +23,19 @@ class InventoryTableBase extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            items: [],
+            allItems: [],
+            filteredAndSortedItems: [],
             total: 0,
             modalClass: "modal",
             idToDelete: '',
             parameterToSortBy: 'name',
-            sortDirection: 'ascendant'
+            sortDirection: 'ascendant',
+            searchFilter: ''
         }
         this.openModal = this.openModal.bind(this);
         this.closeModal = this.closeModal.bind(this);
         this.deleteItem = this.deleteItem.bind(this);
-        this.sort = this.sort.bind(this);
+        this.modifyStateOfItems = this.modifyStateOfItems.bind(this);
     }
 
     componentDidMount() {
@@ -51,12 +53,39 @@ class InventoryTableBase extends Component {
                 items.push(obj);
                 total += parseInt(doc.data().amount);
             });
-            self.setState({ items: items, total: total });
+            self.setState({ allItems: items, filteredAndSortedItems: items, total: total });
         })
     }
 
     openModal(id) {
         this.setState({ modalClass: "modal is-active", idToDelete: id })
+    }
+
+    modifyStateOfItems(event) {
+        this.setState({ [event.target.name]: event.target.value }, () => {
+            let parameter = this.state.parameterToSortBy;
+            let isAscendant = this.state.sortDirection === 'ascendant';
+            let searchTerm = this.state.searchFilter;
+            let items = this.state.allItems;
+            let filteredItems = this.filterItems(searchTerm, items);
+            let sortedItems = this.sortItems(filteredItems, parameter, isAscendant);
+            this.setState({filteredAndSortedItems: sortedItems });
+        })
+    }
+
+    filterItems(searchTerm, itemsList) {
+        let filteredItems = [];
+        for (let item of itemsList) {
+            for (let property in item) {
+                if (property !== "_id") {
+                    if (item[property].toString().includes(searchTerm)) {
+                        filteredItems.push(item);
+                        break;
+                    }
+                }
+            }
+        }
+        return filteredItems;
     }
 
     deleteItem() {
@@ -66,21 +95,15 @@ class InventoryTableBase extends Component {
         });
     }
 
-    sort(event) {
-        this.setState({ [event.target.name]: event.target.value }, () => {
-            console.log(this.state);
-            let parameter = this.state.parameterToSortBy;
-            let isAscendant = this.state.sortDirection === 'ascendant';
-            let items = this.state.items;
-            items.sort((first, second) => {
-                if (first[parameter] < second[parameter])
-                    return isAscendant ? -1 : 1;
-                if (first[parameter] > second[parameter])
-                    return isAscendant ? 1 : -1;
-                return 0;
-            });
-            this.setState({ items: items });
+    sortItems(items, parameter, isAscendant) {
+        items.sort((first, second) => {
+            if (first[parameter] < second[parameter])
+                return isAscendant ? -1 : 1;
+            if (first[parameter] > second[parameter])
+                return isAscendant ? 1 : -1;
+            return 0;
         });
+        return items;
     }
 
     closeModal() {
@@ -88,7 +111,7 @@ class InventoryTableBase extends Component {
     }
 
     renderItems() {
-        let tableItems = this.state.items.map((item, index) => {
+        let tableItems = this.state.filteredAndSortedItems.map((item, index) => {
             return (
                 <tr key={item._id}>
                     <td>
@@ -131,6 +154,12 @@ class InventoryTableBase extends Component {
                         <Link className="button is-success" to="/nuevo-item">Añadir nuevo item</Link>
                     </div>
                     <div className="column has-text-centered">
+                        <div className="control">
+                            <input className="input" type="text" placeholder="Buscar"
+                                name="searchFilter" value={this.state.searchFilter} onChange={this.modifyStateOfItems}></input>
+                        </div>
+                    </div>
+                    <div className="column has-text-centered">
                         <div className="columns is-mobile">
                             <div className="column has-text-right">
                                 <label className="label">Ordenar por</label>
@@ -140,7 +169,7 @@ class InventoryTableBase extends Component {
                                     <div className="control has-text-left">
                                         <div className="select is-primary">
                                             <select name="parameterToSortBy" value={this.state.parameterToSortBy}
-                                                onChange={this.sort}>
+                                                onChange={this.modifyStateOfItems}>
                                                 <option value="name">Nombre</option>
                                                 <option value="code">Código</option>
                                                 <option value="color">Color</option>
@@ -161,7 +190,8 @@ class InventoryTableBase extends Component {
                                 <div className="field has-text-left">
                                     <div className="control has-text-left">
                                         <div className="select is-info">
-                                            <select name="sortDirection" value={this.state.sortDirection} onChange={this.sort}>
+                                            <select name="sortDirection" value={this.state.sortDirection}
+                                                onChange={this.modifyStateOfItems}>
                                                 <option value="ascendant">Ascendente</option>
                                                 <option value="descendant">Descendente</option>
                                             </select>
