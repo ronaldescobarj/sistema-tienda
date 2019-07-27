@@ -8,14 +8,14 @@ class Header extends Component {
             <div>
                 <nav className="navbar is-fixed-top is-link" role="navigation" aria-label="main navigation">
                     <div className="navbar-brand">
-                        <img src="https://bulma.io/images/bulma-logo.png" alt="xd" width="112" height="28"></img>
-                        <a href="/" role="button" className="navbar-burger burger" aria-label="menu" aria-expanded="false" data-target="navbarBasicExample">
+                        <img src="https://firebasestorage.googleapis.com/v0/b/sistema-tienda-c6c67.appspot.com/o/logo.jpg?alt=media&token=57b005fa-116b-4f64-b30b-92c49b9b13a9" alt="xd" width="112" height="28"></img>
+                        <a role="button" className="navbar-burger burger" aria-label="menu" aria-expanded="false" data-target="myNavbar">
                             <span aria-hidden="true"></span>
                             <span aria-hidden="true"></span>
                             <span aria-hidden="true"></span>
                         </a>
                     </div>
-                    <div id="navbarBasicExample" className="navbar-menu">
+                    <div id="myNavbar" className="navbar-menu">
                         <div className="navbar-start">
                             <div className="navbar-item">
                                 <Link to="/inventario" className="button is-light is-outlined">Inventario</Link>
@@ -33,7 +33,6 @@ class Header extends Component {
                                     <button className="button is-danger is-inverted">
                                         Cerrar sesión
                                     </button>
-                                    
                                 </div>
                             </div>
                         </div>

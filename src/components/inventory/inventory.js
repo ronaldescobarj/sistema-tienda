@@ -69,7 +69,7 @@ class InventoryTableBase extends Component {
             let items = this.state.allItems;
             let filteredItems = this.filterItems(searchTerm, items);
             let sortedItems = this.sortItems(filteredItems, parameter, isAscendant);
-            this.setState({filteredAndSortedItems: sortedItems });
+            this.setState({ filteredAndSortedItems: sortedItems });
         })
     }
 
