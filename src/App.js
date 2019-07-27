@@ -7,6 +7,7 @@ import Inventory from './components/inventory/inventory';
 import SalesRecord from './components/sales-record/sales-record';
 import AddItem from './components/add-item/add-item';
 import EditItem from './components/edit-item/edit-item';
+import EditAccount from './components/edit-account/edit-account';
 
 function App() {
   return (
@@ -18,6 +19,7 @@ function App() {
         <Route path="/nuevo-item" component={AddItem} />
         <Route path="/registro-ventas" component={SalesRecord} />
         <Route path="/item/:id" component={EditItem} />
+        <Route path="/editar-cuenta" component={EditAccount} />
       </div>
     </Router>
   );
