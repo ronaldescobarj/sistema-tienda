@@ -47,7 +47,7 @@ class AddItemFormBase extends Component {
     }
 
     redirectToInventory() {
-        this.setState( {redirect: true} )
+        this.setState( {redirect: true} );
     }
 
     onChange(event) {
@@ -64,7 +64,7 @@ class AddItemFormBase extends Component {
 
         return (
             <div className="columns is-mobile">
-                <div className="column column is-half is-offset-one-quarter">
+                <div className="column is-half is-offset-one-quarter">
                     <form onSubmit={this.onSubmit}>
                         <div className="field">
                             <label className="label">Nombre</label>

@@ -8,6 +8,7 @@ import SalesRecord from './components/sales-record/sales-record';
 import AddItem from './components/add-item/add-item';
 import EditItem from './components/edit-item/edit-item';
 import EditAccount from './components/edit-account/edit-account';
+import LoginPage from './components/login/login';
 
 function App() {
   return (
@@ -15,6 +16,7 @@ function App() {
       <div>
         <Header />
         <Route exact path="/" component={MainDashboard} />
+        <Route path="/iniciar-sesion" component={LoginPage} />
         <Route path="/inventario" component={Inventory} />
         <Route path="/nuevo-item" component={AddItem} />
         <Route path="/registro-ventas" component={SalesRecord} />

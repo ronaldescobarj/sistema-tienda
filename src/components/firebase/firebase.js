@@ -39,12 +39,13 @@ class Firebase {
         return this.db.collection("inventory").doc(id).delete();
     }
 
+
     createUser(email, password) {
         this.auth.createUserWithEmailAndPassword(email, password);
     }
 
     login(email, password) {
-        this.auth.signInWithEmailAndPassword(email, password);
+        return this.auth.signInWithEmailAndPassword(email, password);
     }
 
     logout() {
@@ -59,13 +60,6 @@ class Firebase {
         this.auth.currentUser.updatePassword(password);
     }
 
-    getUserById(uid) {
-        this.db.ref(`users/${uid}`);
-    }
-
-    getUsers() {
-        this.db.ref('users');
-    }
 }
 
 export default Firebase;
