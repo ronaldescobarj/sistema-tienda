@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import { Link } from "react-router-dom";
+import LogoutButton from '../logout/logout';
 
 class Header extends Component {
 
@@ -30,9 +31,7 @@ class Header extends Component {
                                     <Link to="/edit-account" className="button is-primary is-inverted is-outlined">
                                         Editar cuenta
                                     </Link>
-                                    <button className="button is-danger is-inverted">
-                                        Cerrar sesión
-                                    </button>
+                                    <LogoutButton />
                                 </div>
                             </div>
                         </div>
