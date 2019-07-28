@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React from 'react';
 import './App.sass';
 import Header from './components/header/header';
 import { BrowserRouter as Router, Route } from "react-router-dom";
@@ -9,34 +9,14 @@ import AddItem from './components/add-item/add-item';
 import EditItem from './components/edit-item/edit-item';
 import EditAccount from './components/edit-account/edit-account';
 import LoginPage from './components/login/login';
-import { withFirebase } from './components/firebase';
+import { withAuthentication } from './components/session';
 
-class App extends Component {
+function App() {
 
-  constructor(props) {
-    super(props);
-    this.state = {
-      authUser: null
-    }
-  }
-
-  componentDidMount() {
-    this.listener = this.props.firebase.auth.onAuthStateChanged(authUser => {
-      authUser
-        ? this.setState({ authUser })
-        : this.setState({ authUser: null });
-    });
-  }
-
-  componentWillUnmount() {
-    this.listener();
-  }
-
-  render() {
-    return (
+  return (
       <Router>
         <div>
-          <Header authUser={this.state.authUser} />
+          <Header />
           <Route exact path="/" component={MainDashboard} />
           <Route path="/iniciar-sesion" component={LoginPage} />
           <Route path="/inventario" component={Inventory} />
@@ -46,9 +26,7 @@ class App extends Component {
           <Route path="/editar-cuenta" component={EditAccount} />
         </div>
       </Router>
-    );
-  }
-
+  );
 }
 
-export default withFirebase(App);
+export default withAuthentication(App);

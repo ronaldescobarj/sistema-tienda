@@ -1,9 +1,9 @@
-import React, { Component } from 'react';
+import React from 'react';
 import { Link } from "react-router-dom";
 import LogoutButton from '../logout/logout';
+import { AuthUserContext } from '../session';
 
-
-const Header = ({ authUser }) => (
+const Header = () => (
     <div>
         <nav className="navbar is-fixed-top is-link" role="navigation" aria-label="main navigation">
             <div className="navbar-brand">
@@ -14,26 +14,28 @@ const Header = ({ authUser }) => (
                     <span aria-hidden="true"></span>
                 </a>
             </div>
-            {authUser ? <div id="myNavbar" className="navbar-menu">
-                <div className="navbar-start">
-                    <div className="navbar-item">
-                        <Link to="/inventario" className="button is-light is-outlined">Inventario</Link>
-                    </div>
-                    <div className="navbar-item">
-                        <Link to="/registro-ventas" className="button is-light is-outlined">Registro de ventas</Link>
-                    </div>
-                </div>
-                <div className="navbar-end">
-                    <div className="navbar-item">
-                        <div className="buttons">
-                            <Link to="/edit-account" className="button is-primary is-inverted is-outlined">
-                                Editar cuenta
-                                    </Link>
-                            <LogoutButton />
+            <AuthUserContext.Consumer>
+                {authUser => authUser ? <div id="myNavbar" className="navbar-menu">
+                    <div className="navbar-start">
+                        <div className="navbar-item">
+                            <Link to="/inventario" className="button is-light is-outlined">Inventario</Link>
+                        </div>
+                        <div className="navbar-item">
+                            <Link to="/registro-ventas" className="button is-light is-outlined">Registro de ventas</Link>
                         </div>
                     </div>
-                </div>
-            </div> : <div></div>}
+                    <div className="navbar-end">
+                        <div className="navbar-item">
+                            <div className="buttons">
+                                <Link to="/edit-account" className="button is-primary is-inverted is-outlined">
+                                    Editar cuenta
+                                    </Link>
+                                <LogoutButton />
+                            </div>
+                        </div>
+                    </div>
+                </div> : <div></div>}
+            </AuthUserContext.Consumer>
         </nav>
         <br></br>
         <br></br>
