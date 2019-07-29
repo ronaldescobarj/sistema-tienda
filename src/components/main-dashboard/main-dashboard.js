@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import { withAuthorization } from '../session';
 
 class MainDashboard extends Component {
 
@@ -11,4 +12,8 @@ class MainDashboard extends Component {
     }
 }
 
-export default MainDashboard;
+const condition = (authUser) => {
+    return authUser != null;
+}
+
+export default withAuthorization(condition)(MainDashboard);
