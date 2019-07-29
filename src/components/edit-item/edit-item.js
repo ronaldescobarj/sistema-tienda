@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import { withFirebase } from '../firebase';
 import { Redirect } from "react-router-dom";
+import { withAuthorization } from '../session';
 
 const EditItem = ({ match }) => (
     <div>
@@ -123,4 +124,8 @@ class EditItemFormBase extends Component {
 
 const EditItemForm = withFirebase(EditItemFormBase);
 
-export default EditItem;
+const condition = (authUser) => {
+    return authUser != null;
+}
+
+export default withAuthorization(condition)(EditItem);

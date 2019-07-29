@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import { withAuthorization } from '../session';
 
 class EditAccount extends Component {
 
@@ -11,4 +12,8 @@ class EditAccount extends Component {
     }
 }
 
-export default EditAccount;
+const condition = (authUser) => {
+    return authUser != null;
+}
+
+export default withAuthorization(condition)(EditAccount);

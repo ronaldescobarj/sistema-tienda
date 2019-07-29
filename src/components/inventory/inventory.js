@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import { withFirebase } from '../firebase';
 import { Link } from "react-router-dom";
+import { withAuthorization } from '../session';
 
 const Inventory = () => (
     <div>
@@ -253,4 +254,8 @@ class InventoryTableBase extends Component {
 
 const InventoryTable = withFirebase(InventoryTableBase);
 
-export default Inventory;
+const condition = (authUser) => {
+    return authUser != null;
+}
+
+export default withAuthorization(condition)(Inventory);
