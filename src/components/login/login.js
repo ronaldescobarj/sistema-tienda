@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import { withFirebase } from '../firebase';
 import { Redirect } from "react-router-dom";
+import { Link } from "react-router-dom";
 
 const LoginPage = () => (
     <div>
@@ -91,8 +92,13 @@ class LoginFormBase extends Component {
                                 />
                             </div>
                         </div>
-                        <div className="control">
-                            <button disabled={isInvalid} type="submit" className="button is-info">Iniciar sesión</button>
+                        <div className="field is-grouped">
+                            <div className="control">
+                                <button disabled={isInvalid} type="submit" className="button is-info">Iniciar sesión</button>
+                            </div>
+                            <div className="control">
+                                <Link to="/olvide-mi-contrasenia" className="button is-light">Olvidé mi contraseña</Link>
+                            </div>
                         </div>
                         {error && <p>{error.message}</p>}
                     </form>
