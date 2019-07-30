@@ -27,7 +27,7 @@ const Header = () => (
                     <div className="navbar-end">
                         <div className="navbar-item">
                             <div className="buttons">
-                                <Link to="/edit-account" className="button is-primary is-inverted is-outlined">
+                                <Link to="/editar-cuenta" className="button is-primary is-inverted is-outlined">
                                     Editar cuenta
                                     </Link>
                                 <LogoutButton />
