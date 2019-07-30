@@ -54,11 +54,11 @@ class Firebase {
     }
 
     resetPassword(email) {
-        this.auth.sendPasswordResetEmail(email);
+        return this.auth.sendPasswordResetEmail(email);
     }
 
     updatePassword(password) {
-        this.auth.currentUser.updatePassword(password);
+        return this.auth.currentUser.updatePassword(password);
     }
 
 }
