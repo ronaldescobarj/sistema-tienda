@@ -2,24 +2,16 @@ import React from 'react';
 import { compose } from 'recompose';
 import AuthUserContext from './context';
 import { withFirebase } from '../firebase';
-import { Redirect } from "react-router-dom";
+import { withRouter } from "react-router-dom";
 
 const withAuthorization = condition => Component => {
     class WithAuthorization extends React.Component {
 
-        constructor(props) {
-            super(props);
-            this.state = { redirect: false };
-        }
         componentDidMount() {
-            this.listener = this.props.firebase.auth.onAuthStateChanged(
-                authUser => {
-                    if (!condition(authUser)) {
-                        // this.props.history.push(ROUTES.SIGN_IN);
-                        this.setState({ redirect: true });
-                    }
-                },
-            );
+            this.listener = this.props.firebase.auth.onAuthStateChanged(authUser => {
+                if (!condition(authUser))
+                    this.props.history.push("/iniciar-sesion");
+            });
         }
 
         componentWillUnmount() {
@@ -27,12 +19,6 @@ const withAuthorization = condition => Component => {
         }
 
         render() {
-            const { redirect } = this.state;
-
-            if (redirect) {
-                return <Redirect to='/iniciar-sesion' />;
-            }
-
             return (
                 <AuthUserContext.Consumer>
                     {authUser =>
@@ -44,6 +30,7 @@ const withAuthorization = condition => Component => {
     }
 
     return compose(
+        withRouter,
         withFirebase,
     )(WithAuthorization);
 };

@@ -1,7 +1,6 @@
 import React, { Component } from 'react';
 import { withFirebase } from '../firebase';
-import { Redirect } from "react-router-dom";
-import { Link } from "react-router-dom";
+import { Link, withRouter } from "react-router-dom";
 
 const LoginPage = () => (
     <div>
@@ -26,12 +25,10 @@ class LoginFormBase extends Component {
         this.state = {
             email: '',
             password: '',
-            error: null,
-            redirect: false
+            error: null
         };
         this.onSubmit = this.onSubmit.bind(this);
         this.onChange = this.onChange.bind(this);
-        this.redirectToMainPage = this.redirectToMainPage.bind(this);
     }
 
     onSubmit(event) {
@@ -39,15 +36,11 @@ class LoginFormBase extends Component {
         event.preventDefault();
         this.props.firebase.login(email, password).then(() => {
             this.setState({ email: '', password: '', error: null });
-            this.redirectToMainPage();
+            this.props.history.push("/");
         })
             .catch(error => {
                 this.setState({ error });
             });
-    }
-
-    redirectToMainPage() {
-        this.setState({ redirect: true })
     }
 
     onChange(event) {
@@ -55,12 +48,7 @@ class LoginFormBase extends Component {
     }
 
     render() {
-        const { error, redirect } = this.state;
-
-        if (redirect) {
-            return <Redirect to='/' />;
-        }
-
+        const { error } = this.state;
         const isInvalid = this.state.password === '' || this.state.email === '';
         return (
             <div className="columns is-mobile">
@@ -108,6 +96,6 @@ class LoginFormBase extends Component {
     }
 }
 
-const LoginForm = withFirebase(LoginFormBase);
+const LoginForm = withRouter(withFirebase(LoginFormBase));
 
 export default LoginPage;

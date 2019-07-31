@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { withFirebase } from '../firebase';
-import { Redirect } from "react-router-dom";
+import { Link, withRouter } from "react-router-dom";
 import { withAuthorization } from '../session';
 
 const AddItem = () => (
@@ -26,12 +26,10 @@ class AddItemFormBase extends Component {
             name: '',
             code: '',
             color: '',
-            amount: 0,
-            redirect: false
+            amount: 0
         };
         this.onSubmit = this.onSubmit.bind(this);
         this.onChange = this.onChange.bind(this);
-        this.redirectToInventory = this.redirectToInventory.bind(this);
     }
 
     onSubmit(event) {
@@ -43,26 +41,21 @@ class AddItemFormBase extends Component {
         };
         event.preventDefault();
         this.props.firebase.addItem(item).then((response) => {
-            this.redirectToInventory();
+            this.setState({
+                name: '',
+                code: '',
+                color: '',
+                amount: 0
+            });
+            this.props.history.push("/inventario");
         })
-    }
-
-    redirectToInventory() {
-        this.setState( {redirect: true} );
     }
 
     onChange(event) {
         this.setState({ [event.target.name]: event.target.value });
     };
 
-
     render() {
-        const { redirect } = this.state;
-
-        if (redirect) {
-            return <Redirect to='/inventario' />;
-        }
-
         return (
             <div className="columns is-mobile">
                 <div className="column is-half is-offset-one-quarter">
@@ -100,7 +93,7 @@ class AddItemFormBase extends Component {
                                 <button type="submit" className="button is-info">Guardar</button>
                             </div>
                             <div className="control">
-                                <button onClick={this.redirectToInventory} className="button is-light">Cancelar</button>
+                                <Link to="/inventario" className="button is-light">Cancelar</Link>
                             </div>
                         </div>
                     </form>
@@ -110,7 +103,7 @@ class AddItemFormBase extends Component {
     }
 }
 
-const AddItemForm = withFirebase(AddItemFormBase);
+const AddItemForm = withRouter(withFirebase(AddItemFormBase));
 
 const condition = (authUser) => {
     return authUser != null;

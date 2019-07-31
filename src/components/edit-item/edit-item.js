@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { withFirebase } from '../firebase';
-import { Redirect } from "react-router-dom";
+import { Link, withRouter } from "react-router-dom";
 import { withAuthorization } from '../session';
 
 const EditItem = ({ match }) => (
@@ -27,11 +27,9 @@ class EditItemFormBase extends Component {
             code: '',
             color: '',
             amount: 0,
-            redirect: false
         };
         this.onSubmit = this.onSubmit.bind(this);
         this.onChange = this.onChange.bind(this);
-        this.redirectToInventory = this.redirectToInventory.bind(this);
     }
 
     componentDidMount() {
@@ -46,10 +44,6 @@ class EditItemFormBase extends Component {
         });
     }
 
-    redirectToInventory() {
-        this.setState({ redirect: true })
-    }
-
     onSubmit(event) {
         let item = {
             name: this.state.name,
@@ -59,7 +53,13 @@ class EditItemFormBase extends Component {
         };
         event.preventDefault();
         this.props.firebase.updateItem(item, this.props.itemId).then(() => {
-            this.redirectToInventory();
+            this.setState({
+                name: '',
+                code: '',
+                color: '',
+                amount: 0,
+            });
+            this.props.history.push("/inventario");
         })
     }
 
@@ -67,14 +67,7 @@ class EditItemFormBase extends Component {
         this.setState({ [event.target.name]: event.target.value });
     };
 
-
     render() {
-        const { redirect } = this.state;
-
-        if (redirect) {
-            return <Redirect to='/inventario' />;
-        }
-
         return (
             <div className="columns is-mobile">
                 <div className="column is-half is-offset-one-quarter">
@@ -112,7 +105,7 @@ class EditItemFormBase extends Component {
                                 <button type="submit" className="button is-info">Guardar</button>
                             </div>
                             <div className="control">
-                                <button onClick={this.redirectToInventory} className="button is-light">Cancelar</button>
+                                <Link to="/inventario" className="button is-light">Cancelar</Link>
                             </div>
                         </div>
                     </form>
@@ -122,7 +115,7 @@ class EditItemFormBase extends Component {
     }
 }
 
-const EditItemForm = withFirebase(EditItemFormBase);
+const EditItemForm = withRouter(withFirebase(EditItemFormBase));
 
 const condition = (authUser) => {
     return authUser != null;
