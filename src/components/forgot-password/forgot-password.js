@@ -50,9 +50,9 @@ class ForgotPasswordFormBase extends Component {
 
 
     render() {
-        const { error } = this.state;
+        const { email, error, showMessage } = this.state;
 
-        const isInvalid = this.state.email === '';
+        const isInvalid = email === '';
 
         return (
             <div>
@@ -65,7 +65,7 @@ class ForgotPasswordFormBase extends Component {
                                     <input
                                         className="input"
                                         name="email"
-                                        value={this.state.email}
+                                        value={email}
                                         onChange={this.handleChange}
                                         type="text"
                                         placeholder="Correo electrónico"
@@ -79,7 +79,7 @@ class ForgotPasswordFormBase extends Component {
                         </form>
                     </div>
                 </div>
-                {this.state.showMessage ?
+                {showMessage ?
                     <div className="columns is-mobile">
                         <div className="column is-half is-offset-one-quarter">
                             <article className="message">

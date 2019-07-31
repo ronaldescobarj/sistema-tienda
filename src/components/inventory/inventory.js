@@ -34,7 +34,7 @@ class InventoryTableBase extends Component {
 
     constructor(props) {
         super(props);
-        this.state = { ... INITIAL_STATE };
+        this.state = { ...INITIAL_STATE };
         this.openModal = this.openModal.bind(this);
         this.closeModal = this.closeModal.bind(this);
         this.deleteItem = this.deleteItem.bind(this);
@@ -66,12 +66,10 @@ class InventoryTableBase extends Component {
 
     modifyStateOfItems(event) {
         this.setState({ [event.target.name]: event.target.value }, () => {
-            let parameter = this.state.parameterToSortBy;
+            let { allItems, parameterToSortBy, searchFilter } = this.state;
             let isAscendant = this.state.sortDirection === 'ascendant';
-            let searchTerm = this.state.searchFilter;
-            let items = this.state.allItems;
-            let filteredItems = this.filterItems(searchTerm, items);
-            let sortedItems = this.sortItems(filteredItems, parameter, isAscendant);
+            let filteredItems = this.filterItems(searchFilter, allItems);
+            let sortedItems = this.sortItems(filteredItems, parameterToSortBy, isAscendant);
             this.setState({ filteredAndSortedItems: sortedItems });
         })
     }
@@ -150,6 +148,7 @@ class InventoryTableBase extends Component {
     }
 
     render() {
+        const { total, modalClass, parameterToSortBy, sortDirection, searchFilter } = this.state;
         return (
             <div>
                 <div className="columns">
@@ -159,7 +158,7 @@ class InventoryTableBase extends Component {
                     <div className="column has-text-centered">
                         <div className="control">
                             <input className="input" type="text" placeholder="Buscar"
-                                name="searchFilter" value={this.state.searchFilter} onChange={this.modifyStateOfItems}></input>
+                                name="searchFilter" value={searchFilter} onChange={this.modifyStateOfItems}></input>
                         </div>
                     </div>
                     <div className="column has-text-centered">
@@ -171,7 +170,7 @@ class InventoryTableBase extends Component {
                                 <div className="field">
                                     <div className="control has-text-left">
                                         <div className="select is-primary">
-                                            <select name="parameterToSortBy" value={this.state.parameterToSortBy}
+                                            <select name="parameterToSortBy" value={parameterToSortBy}
                                                 onChange={this.modifyStateOfItems}>
                                                 <option value="name">Nombre</option>
                                                 <option value="code">Código</option>
@@ -193,7 +192,7 @@ class InventoryTableBase extends Component {
                                 <div className="field has-text-left">
                                     <div className="control has-text-left">
                                         <div className="select is-info">
-                                            <select name="sortDirection" value={this.state.sortDirection}
+                                            <select name="sortDirection" value={sortDirection}
                                                 onChange={this.modifyStateOfItems}>
                                                 <option value="ascendant">Ascendente</option>
                                                 <option value="descendant">Descendente</option>
@@ -222,7 +221,7 @@ class InventoryTableBase extends Component {
                                     <th></th>
                                     <th></th>
                                     <th>Total</th>
-                                    <th>{this.state.total}</th>
+                                    <th>{total}</th>
                                     <th></th>
                                 </tr>
                             </tfoot>
@@ -233,7 +232,7 @@ class InventoryTableBase extends Component {
                     </div>
                 </div>
 
-                <div className={this.state.modalClass}>
+                <div className={modalClass}>
                     <div className="modal-background"></div>
                     <div className="modal-card">
                         <header className="modal-card-head">

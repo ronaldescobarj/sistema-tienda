@@ -49,8 +49,8 @@ class LoginFormBase extends Component {
     }
 
     render() {
-        const { error } = this.state;
-        const isInvalid = this.state.password === '' || this.state.email === '';
+        const { email, password, error } = this.state;
+        const isInvalid = password === '' || email === '';
         return (
             <div className="columns is-mobile">
                 <div className="column is-half is-offset-one-quarter">
@@ -61,7 +61,7 @@ class LoginFormBase extends Component {
                                 <input
                                     className="input"
                                     name="email"
-                                    value={this.state.email}
+                                    value={email}
                                     onChange={this.handleChange}
                                     type="text"
                                     placeholder="Correo electrónico"
@@ -74,7 +74,7 @@ class LoginFormBase extends Component {
                                 <input
                                     className="input"
                                     name="password"
-                                    value={this.state.password}
+                                    value={password}
                                     onChange={this.handleChange}
                                     type="password"
                                     placeholder="Contraseña"

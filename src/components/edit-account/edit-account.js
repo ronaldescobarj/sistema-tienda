@@ -50,9 +50,9 @@ class ChangePasswordFormBase extends Component {
     }
 
     render() {
-        const { error } = this.state;
+        const { passwordOne, passwordTwo, error, showMessage } = this.state;
 
-        const isInvalid = this.state.passwordOne !== this.state.passwordTwo || this.state.passwordOne === '';
+        const isInvalid = passwordOne !== passwordTwo || passwordOne === '';
 
         return (
             <div>
@@ -65,7 +65,7 @@ class ChangePasswordFormBase extends Component {
                                     <input
                                     className="input"
                                         name="passwordOne"
-                                        value={this.state.passwordOne}
+                                        value={passwordOne}
                                         onChange={this.handleChange}
                                         type="password"
                                         placeholder="Nueva contraseña"
@@ -78,7 +78,7 @@ class ChangePasswordFormBase extends Component {
                                     <input
                                         className="input"
                                         name="passwordTwo"
-                                        value={this.state.passwordTwo}
+                                        value={passwordTwo}
                                         onChange={this.handleChange}
                                         type="password"
                                         placeholder="Confirmar nueva contraseña"
@@ -92,7 +92,7 @@ class ChangePasswordFormBase extends Component {
                         </form>
                     </div>
                 </div>
-                {this.state.showMessage ?
+                {showMessage ?
                     <div className="columns is-mobile">
                         <div className="column is-half is-offset-one-quarter">
                             <article className="message">

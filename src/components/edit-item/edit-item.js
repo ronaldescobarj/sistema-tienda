@@ -65,6 +65,7 @@ class EditItemFormBase extends Component {
     };
 
     render() {
+        const { name, code, color, amount } = this.state;
         return (
             <div className="columns is-mobile">
                 <div className="column is-half is-offset-one-quarter">
@@ -73,28 +74,28 @@ class EditItemFormBase extends Component {
                             <label className="label">Nombre</label>
                             <div className="control">
                                 <input className="input" type="text" placeholder="Nombre"
-                                    name="name" value={this.state.name} onChange={this.handleChange}></input>
+                                    name="name" value={name} onChange={this.handleChange}></input>
                             </div>
                         </div>
                         <div className="field">
                             <label className="label">Código</label>
                             <div className="control">
                                 <input className="input" type="text" placeholder="Código"
-                                    name="code" value={this.state.code} onChange={this.handleChange}></input>
+                                    name="code" value={code} onChange={this.handleChange}></input>
                             </div>
                         </div>
                         <div className="field">
                             <label className="label">Color</label>
                             <div className="control">
                                 <input className="input" type="text" placeholder="Color"
-                                    name="color" value={this.state.color} onChange={this.handleChange}></input>
+                                    name="color" value={color} onChange={this.handleChange}></input>
                             </div>
                         </div>
                         <div className="field">
                             <label className="label">Cantidad</label>
                             <div className="control">
                                 <input className="input" type="number" placeholder="Cantidad"
-                                    name="amount" value={this.state.amount} onChange={this.handleChange}></input>
+                                    name="amount" value={amount} onChange={this.handleChange}></input>
                             </div>
                         </div>
                         <div className="field is-grouped">
