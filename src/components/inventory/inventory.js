@@ -74,10 +74,9 @@ class InventoryTableBase extends Component {
 
     modifyStateOfItems(event) {
         this.setState({ [event.target.name]: event.target.value }, () => {
-            let { allItems, parameterToSortBy, searchFilter } = this.state;
-            let isAscendant = this.state.sortDirection === 'ascendant';
+            let { allItems, parameterToSortBy, sortDirection, searchFilter } = this.state;
             let filteredItems = this.filterItems(searchFilter, allItems);
-            let sortedItems = this.sortItems(filteredItems, parameterToSortBy, isAscendant);
+            let sortedItems = this.sortItems(filteredItems, parameterToSortBy, sortDirection);
             let total = this.calculateTotal(sortedItems);
             this.setState({ filteredAndSortedItems: sortedItems, total: total });
         })
@@ -99,13 +98,20 @@ class InventoryTableBase extends Component {
     }
 
     deleteItem() {
-        this.props.firebase.deleteItem(this.state.idToDelete).then(() => {
-            this.getData();
+        let idToDelete = this.state.idToDelete;
+        this.props.firebase.deleteItem(idToDelete).then(() => {
+            let { allItems, parameterToSortBy, sortDirection, searchFilter } = this.state;
+            allItems = allItems.filter(element => element._id !== idToDelete);
+            let filteredItems = this.filterItems(searchFilter, allItems);
+            let sortedItems = this.sortItems(filteredItems, parameterToSortBy, sortDirection);
+            let total = this.calculateTotal(sortedItems);
+            this.setState({ allItems: allItems, filteredAndSortedItems: sortedItems, total: total });
             this.closeModal();
         });
     }
 
-    sortItems(items, parameter, isAscendant) {
+    sortItems(items, parameter, sortDirection) {
+        let isAscendant = sortDirection === 'ascendant';
         items.sort((first, second) => {
             if (first[parameter] < second[parameter])
                 return isAscendant ? -1 : 1;
