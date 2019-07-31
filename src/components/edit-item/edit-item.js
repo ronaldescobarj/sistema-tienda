@@ -30,8 +30,8 @@ class EditItemFormBase extends Component {
     constructor(props) {
         super(props);
         this.state = { ...INITIAL_STATE };
-        this.onSubmit = this.onSubmit.bind(this);
-        this.onChange = this.onChange.bind(this);
+        this.handleSubmit = this.handleSubmit.bind(this);
+        this.handleChange = this.handleChange.bind(this);
     }
 
     componentDidMount() {
@@ -46,7 +46,7 @@ class EditItemFormBase extends Component {
         });
     }
 
-    onSubmit(event) {
+    handleSubmit(event) {
         let item = this.state;
         event.preventDefault();
         this.props.firebase.updateItem(item, this.props.itemId).then(() => {
@@ -55,7 +55,7 @@ class EditItemFormBase extends Component {
         })
     }
 
-    onChange(event) {
+    handleChange(event) {
         let value;
         if (event.target.type === "number")
             value = parseInt(event.target.value);
@@ -68,33 +68,33 @@ class EditItemFormBase extends Component {
         return (
             <div className="columns is-mobile">
                 <div className="column is-half is-offset-one-quarter">
-                    <form onSubmit={this.onSubmit}>
+                    <form onSubmit={this.handleSubmit}>
                         <div className="field">
                             <label className="label">Nombre</label>
                             <div className="control">
                                 <input className="input" type="text" placeholder="Nombre"
-                                    name="name" value={this.state.name} onChange={this.onChange}></input>
+                                    name="name" value={this.state.name} onChange={this.handleChange}></input>
                             </div>
                         </div>
                         <div className="field">
                             <label className="label">Código</label>
                             <div className="control">
                                 <input className="input" type="text" placeholder="Código"
-                                    name="code" value={this.state.code} onChange={this.onChange}></input>
+                                    name="code" value={this.state.code} onChange={this.handleChange}></input>
                             </div>
                         </div>
                         <div className="field">
                             <label className="label">Color</label>
                             <div className="control">
                                 <input className="input" type="text" placeholder="Color"
-                                    name="color" value={this.state.color} onChange={this.onChange}></input>
+                                    name="color" value={this.state.color} onChange={this.handleChange}></input>
                             </div>
                         </div>
                         <div className="field">
                             <label className="label">Cantidad</label>
                             <div className="control">
                                 <input className="input" type="number" placeholder="Cantidad"
-                                    name="amount" value={this.state.amount} onChange={this.onChange}></input>
+                                    name="amount" value={this.state.amount} onChange={this.handleChange}></input>
                             </div>
                         </div>
                         <div className="field is-grouped">

@@ -30,11 +30,11 @@ class ChangePasswordFormBase extends Component {
     constructor(props) {
         super(props);
         this.state = { ...INITIAL_STATE };
-        this.onSubmit = this.onSubmit.bind(this);
-        this.onChange = this.onChange.bind(this);
+        this.handleSubmit = this.handleSubmit.bind(this);
+        this.handleChange = this.handleChange.bind(this);
     }
 
-    onSubmit(event) {
+    handleSubmit(event) {
         const { passwordOne } = this.state;
         event.preventDefault();
         this.props.firebase.updatePassword(passwordOne).then(() => {
@@ -45,7 +45,7 @@ class ChangePasswordFormBase extends Component {
             });
     }
 
-    onChange(event) {
+    handleChange(event) {
         this.setState({ [event.target.name]: event.target.value });
     }
 
@@ -58,7 +58,7 @@ class ChangePasswordFormBase extends Component {
             <div>
                 <div className="columns is-mobile">
                     <div className="column is-half is-offset-one-quarter">
-                        <form onSubmit={this.onSubmit}>
+                        <form onSubmit={this.handleSubmit}>
                             <div className="field">
                                 <label className="label">Nueva contraseña</label>
                                 <div className="control">
@@ -66,7 +66,7 @@ class ChangePasswordFormBase extends Component {
                                     className="input"
                                         name="passwordOne"
                                         value={this.state.passwordOne}
-                                        onChange={this.onChange}
+                                        onChange={this.handleChange}
                                         type="password"
                                         placeholder="Nueva contraseña"
                                     />
@@ -79,7 +79,7 @@ class ChangePasswordFormBase extends Component {
                                         className="input"
                                         name="passwordTwo"
                                         value={this.state.passwordTwo}
-                                        onChange={this.onChange}
+                                        onChange={this.handleChange}
                                         type="password"
                                         placeholder="Confirmar nueva contraseña"
                                     />

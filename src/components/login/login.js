@@ -28,11 +28,11 @@ class LoginFormBase extends Component {
     constructor(props) {
         super(props);
         this.state = { ...INITIAL_STATE };
-        this.onSubmit = this.onSubmit.bind(this);
-        this.onChange = this.onChange.bind(this);
+        this.handleSubmit = this.handleSubmit.bind(this);
+        this.handleChange = this.handleChange.bind(this);
     }
 
-    onSubmit(event) {
+    handleSubmit(event) {
         const { email, password } = this.state;
         event.preventDefault();
         this.props.firebase.login(email, password).then(() => {
@@ -44,7 +44,7 @@ class LoginFormBase extends Component {
             });
     }
 
-    onChange(event) {
+    handleChange(event) {
         this.setState({ [event.target.name]: event.target.value });
     }
 
@@ -54,7 +54,7 @@ class LoginFormBase extends Component {
         return (
             <div className="columns is-mobile">
                 <div className="column is-half is-offset-one-quarter">
-                    <form onSubmit={this.onSubmit}>
+                    <form onSubmit={this.handleSubmit}>
                         <div className="field">
                             <label className="label">Nombre</label>
                             <div className="control">
@@ -62,7 +62,7 @@ class LoginFormBase extends Component {
                                     className="input"
                                     name="email"
                                     value={this.state.email}
-                                    onChange={this.onChange}
+                                    onChange={this.handleChange}
                                     type="text"
                                     placeholder="Correo electrónico"
                                 />
@@ -75,7 +75,7 @@ class LoginFormBase extends Component {
                                     className="input"
                                     name="password"
                                     value={this.state.password}
-                                    onChange={this.onChange}
+                                    onChange={this.handleChange}
                                     type="password"
                                     placeholder="Contraseña"
                                 />
