@@ -60,6 +60,14 @@ class InventoryTableBase extends Component {
         })
     }
 
+    calculateTotal(items) {
+        let total = 0;
+        items.forEach(item => {
+            total += parseInt(item.amount);
+        })
+        return total;
+    }
+
     openModal(id) {
         this.setState({ modalClass: "modal is-active", idToDelete: id })
     }
@@ -70,7 +78,8 @@ class InventoryTableBase extends Component {
             let isAscendant = this.state.sortDirection === 'ascendant';
             let filteredItems = this.filterItems(searchFilter, allItems);
             let sortedItems = this.sortItems(filteredItems, parameterToSortBy, isAscendant);
-            this.setState({ filteredAndSortedItems: sortedItems });
+            let total = this.calculateTotal(sortedItems);
+            this.setState({ filteredAndSortedItems: sortedItems, total: total });
         })
     }
 
