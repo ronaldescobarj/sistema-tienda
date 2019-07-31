@@ -7,7 +7,6 @@ const withAuthentication = Component => {
         
         constructor(props) {
             super(props);
-
             this.state = {
                 authUser: null,
             };

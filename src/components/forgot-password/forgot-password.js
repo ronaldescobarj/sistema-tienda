@@ -2,6 +2,12 @@ import React, { Component } from 'react';
 import { withFirebase } from '../firebase';
 import { Link } from "react-router-dom";
 
+const INITIAL_STATE = {
+    email: '',
+    error: null,
+    showMessage: false
+}
+
 const ForgotPassword = () => (
     <div>
         <section className="hero is-small is-primary">
@@ -21,11 +27,7 @@ const ForgotPassword = () => (
 class ForgotPasswordFormBase extends Component {
     constructor(props) {
         super(props);
-        this.state = {
-            email: '',
-            error: null,
-            showMessage: false
-        };
+        this.state = { ...INITIAL_STATE };
         this.onSubmit = this.onSubmit.bind(this);
         this.onChange = this.onChange.bind(this);
     }
@@ -91,8 +93,7 @@ class ForgotPasswordFormBase extends Component {
                                         <Link to="/iniciar-sesion" className="button is-info">
                                             Volver a inicio de sesión
                                     </Link>
-                                    </div>
-                                    
+                                    </div>    
                                 </div>
                             </article>
                         </div>

@@ -3,6 +3,17 @@ import { withFirebase } from '../firebase';
 import { Link } from "react-router-dom";
 import { withAuthorization } from '../session';
 
+const INITIAL_STATE = {
+    allItems: [],
+    filteredAndSortedItems: [],
+    total: 0,
+    modalClass: "modal",
+    idToDelete: '',
+    parameterToSortBy: 'name',
+    sortDirection: 'ascendant',
+    searchFilter: ''
+}
+
 const Inventory = () => (
     <div>
         <section className="hero is-small is-primary">
@@ -23,16 +34,7 @@ class InventoryTableBase extends Component {
 
     constructor(props) {
         super(props);
-        this.state = {
-            allItems: [],
-            filteredAndSortedItems: [],
-            total: 0,
-            modalClass: "modal",
-            idToDelete: '',
-            parameterToSortBy: 'name',
-            sortDirection: 'ascendant',
-            searchFilter: ''
-        }
+        this.state = { ... INITIAL_STATE };
         this.openModal = this.openModal.bind(this);
         this.closeModal = this.closeModal.bind(this);
         this.deleteItem = this.deleteItem.bind(this);

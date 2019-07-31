@@ -2,6 +2,12 @@ import React, { Component } from 'react';
 import { withFirebase } from '../firebase';
 import { Link, withRouter } from "react-router-dom";
 
+const INITIAL_STATE = {
+    email: '',
+    password: '',
+    error: null
+}
+
 const LoginPage = () => (
     <div>
         <section className="hero is-small is-primary">
@@ -21,12 +27,7 @@ const LoginPage = () => (
 class LoginFormBase extends Component {
     constructor(props) {
         super(props);
-
-        this.state = {
-            email: '',
-            password: '',
-            error: null
-        };
+        this.state = { ...INITIAL_STATE };
         this.onSubmit = this.onSubmit.bind(this);
         this.onChange = this.onChange.bind(this);
     }
@@ -35,7 +36,7 @@ class LoginFormBase extends Component {
         const { email, password } = this.state;
         event.preventDefault();
         this.props.firebase.login(email, password).then(() => {
-            this.setState({ email: '', password: '', error: null });
+            this.setState({ ...INITIAL_STATE });
             this.props.history.push("/");
         })
             .catch(error => {

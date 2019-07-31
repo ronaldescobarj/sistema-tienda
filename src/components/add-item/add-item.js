@@ -3,6 +3,13 @@ import { withFirebase } from '../firebase';
 import { Link, withRouter } from "react-router-dom";
 import { withAuthorization } from '../session';
 
+const INITIAL_STATE = {
+    name: '',
+    code: '',
+    color: '',
+    amount: 0
+}
+
 const AddItem = () => (
     <div>
         <section className="hero is-small is-primary">
@@ -22,37 +29,27 @@ const AddItem = () => (
 class AddItemFormBase extends Component {
     constructor(props) {
         super(props);
-        this.state = {
-            name: '',
-            code: '',
-            color: '',
-            amount: 0
-        };
+        this.state = { ...INITIAL_STATE };
         this.onSubmit = this.onSubmit.bind(this);
         this.onChange = this.onChange.bind(this);
     }
 
     onSubmit(event) {
-        let item = {
-            name: this.state.name,
-            code: this.state.code,
-            color: this.state.color,
-            amount: parseInt(this.state.amount)
-        };
+        let item = this.state;
         event.preventDefault();
         this.props.firebase.addItem(item).then((response) => {
-            this.setState({
-                name: '',
-                code: '',
-                color: '',
-                amount: 0
-            });
+            this.setState({ ...INITIAL_STATE });
             this.props.history.push("/inventario");
         })
     }
 
     onChange(event) {
-        this.setState({ [event.target.name]: event.target.value });
+        let value;
+        if (event.target.type === "number")
+            value = parseInt(event.target.value);
+        else
+            value = event.target.value;
+        this.setState({ [event.target.name]: value });
     };
 
     render() {

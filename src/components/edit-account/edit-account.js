@@ -3,6 +3,13 @@ import { withFirebase } from '../firebase';
 import { Link } from "react-router-dom";
 import { withAuthorization } from '../session';
 
+const INITIAL_STATE = {
+    passwordOne: '',
+    passwordTwo: '',
+    error: null,
+    showMessage: false
+}
+
 const EditAccount = () => (
     <div>
         <section className="hero is-small is-primary">
@@ -22,13 +29,7 @@ const EditAccount = () => (
 class ChangePasswordFormBase extends Component {
     constructor(props) {
         super(props);
-
-        this.state = {
-            passwordOne: '',
-            passwordTwo: '',
-            error: null,
-            showMessage: false
-        };
+        this.state = { ...INITIAL_STATE };
         this.onSubmit = this.onSubmit.bind(this);
         this.onChange = this.onChange.bind(this);
     }
