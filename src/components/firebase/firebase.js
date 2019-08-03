@@ -28,6 +28,10 @@ class Firebase {
         return this.db.collection("inventory").doc(id).get();
     }
 
+    getItemsByParameter(parameter, value) {
+        return this.db.collection("inventory").where(parameter, "==", value).get();
+    }
+
     addItem(item) {
         return this.db.collection("inventory").add(item);
     }

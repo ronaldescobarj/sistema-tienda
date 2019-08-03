@@ -11,6 +11,7 @@ import EditAccount from './components/edit-account/edit-account';
 import LoginPage from './components/login/login';
 import { withAuthentication } from './components/session';
 import ForgotPassword from './components/forgot-password/forgot-password';
+import RegisterSale from './components/register-sale/register-sale';
 
 function App() {
 
@@ -23,6 +24,7 @@ function App() {
         <Route path="/inventario" component={Inventory} />
         <Route path="/nuevo-item" component={AddItem} />
         <Route path="/registro-ventas" component={SalesRecord} />
+        <Route path="/registrar-venta" component={RegisterSale} />
         <Route path="/item/:id" component={EditItem} />
         <Route path="/editar-cuenta" component={EditAccount} />
         <Route path="/olvide-mi-contrasenia" component={ForgotPassword} />
