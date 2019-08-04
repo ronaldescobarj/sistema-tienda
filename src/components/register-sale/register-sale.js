@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import { withFirebase } from '../firebase';
 import { Link, withRouter } from "react-router-dom";
 import { withAuthorization } from '../session';
+import axios from 'axios';
 
 const INITIAL_STATE = {
     date: '',
@@ -56,35 +57,30 @@ class RegisterSaleFormBase extends Component {
     }
 
     getModels() {
-        this.props.firebase.getItems().then((response) => {
-            let models = new Map();
-            let modelKey, modelValue;
-            response.forEach(doc => {
-                modelKey = JSON.stringify({ model: doc.data().name, code: doc.data().code });
-                if (models.has(modelKey)) {
-                    modelValue = models.get(modelKey);
-                    modelValue.push({ color: doc.data().color, amount: doc.data().amount });
-                }
-                else {
-                    modelValue = [{ color: doc.data().color, amount: doc.data().amount }];
-                }
-                models.set(modelKey, modelValue);
-            });
-            let modelsArray = [];
-            let newModel;
-            for (let model of [...models]) {
-                newModel = JSON.parse(model[0]);
-                newModel.colors = model[1];
-                modelsArray.push(newModel);
-            }
-            this.setState({ models: modelsArray });
+        axios.get('https://us-central1-sistema-tienda-c6c67.cloudfunctions.net/getModelsWithColors')
+        .then(response => {
+            this.setState({ models: response.data });
         })
     }
 
     handleSubmit(event) {
-        let item = this.state;
+        let sale = {
+            date: this.state.date,
+            model: this.state.model,
+            code: this.state.code,
+            color: this.state.color,
+            amountGiven: this.state.amountGiven,
+            amountOnStock: this.state.amountOnStock,
+            amountSoldAtRegularPrice: this.state.amountSoldAtRegularPrice,
+            regularPrice: this.state.regularPrice,
+            totalToPayOnRegularPrice: this.state.totalToPayOnRegularPrice,
+            amountSoldAtOfferPrice: this.state.amountSoldAtOfferPrice,
+            offerPrice: this.state.offerPrice,
+            totalToPayOnOfferPrice: this.state.totalToPayOnOfferPrice,
+            totalToPay: this.state.totalToPay
+        };
         event.preventDefault();
-        this.props.firebase.addItem(item).then((response) => {
+        this.props.firebase.registerSale(sale).then((response) => {
             this.setState({ ...INITIAL_STATE });
             this.props.history.push("/registro-de-ventas");
         })
@@ -107,7 +103,7 @@ class RegisterSaleFormBase extends Component {
     }
 
     changeColor(event) {
-        let color = this.state.selectedModel.colors.find(col => col.color == event.target.value);
+        let color = this.state.selectedModel.colors.find(col => col.color === event.target.value);
         this.setState({ selectedColor: color, color: color.color });
     }
 
@@ -272,9 +268,9 @@ class RegisterSaleFormBase extends Component {
                                 />
                             </div>
                         </div>
-                        <div class="field">
-                            <div class="control">
-                                <label class="checkbox">
+                        <div className="field">
+                            <div className="control">
+                                <label className="checkbox">
                                     <input
                                         type="checkbox"
                                         name="hasOffer"

@@ -44,6 +44,10 @@ class Firebase {
         return this.db.collection("inventory").doc(id).delete();
     }
 
+    registerSale(sale) {
+        return this.db.collection("sales").add(sale);
+    }
+
     createUser(email, password) {
         this.auth.createUserWithEmailAndPassword(email, password);
     }
