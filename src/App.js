@@ -12,6 +12,7 @@ import LoginPage from './components/login/login';
 import { withAuthentication } from './components/session';
 import ForgotPassword from './components/forgot-password/forgot-password';
 import RegisterSale from './components/register-sale/register-sale';
+import CustomersList from './components/customers-list/customers-list';
 
 function App() {
 
@@ -23,9 +24,10 @@ function App() {
         <Route path="/iniciar-sesion" component={LoginPage} />
         <Route path="/inventario" component={Inventory} />
         <Route path="/nuevo-item" component={AddItem} />
+        <Route path="/item/:id" component={EditItem} />
         <Route path="/registro-ventas" component={SalesRecord} />
         <Route path="/registrar-venta" component={RegisterSale} />
-        <Route path="/item/:id" component={EditItem} />
+        <Route path="/clientes" component={CustomersList} />
         <Route path="/editar-cuenta" component={EditAccount} />
         <Route path="/olvide-mi-contrasenia" component={ForgotPassword} />
       </div>

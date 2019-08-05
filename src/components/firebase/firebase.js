@@ -68,6 +68,30 @@ class Firebase {
         return this.db.collection("sales").doc(id).delete();
     }
 
+    getCustomers() {
+        return this.db.collection("customers").get();
+    }
+
+    getCustomerById(id) {
+        return this.db.collection("customers").doc(id).get();
+    }
+
+    getCustomersByParameter(parameter, value) {
+        return this.db.collection("customers").where(parameter, "==", value).get();
+    }
+
+    registerCustomer(customer) {
+        return this.db.collection("customers").add(customer);
+    }
+
+    updateCustomer(customer, id) {
+        return this.db.collection("customers").doc(id).set(customer);
+    }
+
+    deleteCustomer(id) {
+        return this.db.collection("customers").doc(id).delete();
+    }
+
     createUser(email, password) {
         this.auth.createUserWithEmailAndPassword(email, password);
     }
