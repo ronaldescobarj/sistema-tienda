@@ -51,10 +51,10 @@ class InventoryTableBase extends Component {
         let total = 0;
         this.props.firebase.getItems().then((response) => {
             response.forEach(doc => {
-                let obj = doc.data();
-                obj["_id"] = doc.id;
-                items.push(obj);
-                total += parseInt(doc.data().amount);
+                let item = doc.data();
+                item["_id"] = doc.id;
+                items.push(item);
+                total += parseInt(item.amount);
             });
             self.setState({ allItems: items, filteredAndSortedItems: items, total: total });
         })

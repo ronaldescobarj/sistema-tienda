@@ -44,8 +44,28 @@ class Firebase {
         return this.db.collection("inventory").doc(id).delete();
     }
 
+    getSales() {
+        return this.db.collection("sales").get();
+    }
+
+    getSaleById(id) {
+        return this.db.collection("sales").doc(id).get();
+    }
+
+    getSalesByParameter(parameter, value) {
+        return this.db.collection("sales").where(parameter, "==", value).get();
+    }
+
     registerSale(sale) {
         return this.db.collection("sales").add(sale);
+    }
+
+    updateSale(sale, id) {
+        return this.db.collection("sales").doc(id).set(sale);
+    }
+
+    deleteSale(id) {
+        return this.db.collection("sales").doc(id).delete();
     }
 
     createUser(email, password) {
@@ -67,7 +87,6 @@ class Firebase {
     updatePassword(password) {
         return this.auth.currentUser.updatePassword(password);
     }
-
 }
 
 export default Firebase;
