@@ -20,6 +20,7 @@ class Firebase {
         this.logout = this.logout.bind(this);
     }
 
+    //INVENTORY
     getItems() {
         return this.db.collection("inventory").get();
     }
@@ -44,6 +45,7 @@ class Firebase {
         return this.db.collection("inventory").doc(id).delete();
     }
 
+    //SALES
     getSales() {
         return this.db.collection("sales").get();
     }
@@ -68,6 +70,7 @@ class Firebase {
         return this.db.collection("sales").doc(id).delete();
     }
 
+    //CUSTOMERS
     getCustomers() {
         return this.db.collection("customers").get();
     }
@@ -80,7 +83,7 @@ class Firebase {
         return this.db.collection("customers").where(parameter, "==", value).get();
     }
 
-    registerCustomer(customer) {
+    addCustomer(customer) {
         return this.db.collection("customers").add(customer);
     }
 
@@ -92,6 +95,7 @@ class Firebase {
         return this.db.collection("customers").doc(id).delete();
     }
 
+    //USERS
     createUser(email, password) {
         this.auth.createUserWithEmailAndPassword(email, password);
     }
