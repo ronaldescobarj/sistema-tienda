@@ -8,7 +8,6 @@ const INITIAL_STATE = {
     filteredAndSortedCustomers: [],
     modalClass: "modal",
     idToDelete: '',
-    parameterToSortBy: 'name',
     sortDirection: 'ascendant',
     searchFilter: ''
 }
@@ -73,10 +72,8 @@ class CustomersTableBase extends Component {
     filterCustomers(searchTerm, customersList) {
         let filteredCustomers = [];
         for (let customer of customersList) {
-            if (customer.name.includes(searchTerm)) {
+            if (customer.name.includes(searchTerm))
                 filteredCustomers.push(customer);
-                break;
-            }
         }
         return filteredCustomers;
     }
