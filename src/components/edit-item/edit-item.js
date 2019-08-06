@@ -22,7 +22,7 @@ const EditItem = ({ match }) => (
             </div>
         </section>
         <br></br>
-        <EditItemForm itemId={match.params.id} />
+        <EditItemForm itemId={match.params.itemId} />
     </div>
 );
 

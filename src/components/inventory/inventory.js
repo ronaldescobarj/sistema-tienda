@@ -145,7 +145,7 @@ class InventoryTableBase extends Component {
                     <td>
                         <div className="field has-addons">
                             <p className="control">
-                                <Link className="button is-info" to={"/item/" + item._id}>
+                                <Link className="button is-info" to={"/inventario/item/" + item._id}>
                                     Ver/Editar
                                 </Link>
                             </p>
@@ -168,7 +168,7 @@ class InventoryTableBase extends Component {
             <div>
                 <div className="columns">
                     <div className="column has-text-centered">
-                        <Link className="button is-success" to="/nuevo-item">Añadir nuevo item</Link>
+                        <Link className="button is-success" to="/inventario/nuevo-item">Añadir nuevo item</Link>
                     </div>
                     <div className="column has-text-centered">
                         <div className="control">
@@ -262,7 +262,6 @@ class InventoryTableBase extends Component {
                         </footer>
                     </div>
                 </div>
-
             </div>
         );
     }

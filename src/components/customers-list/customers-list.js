@@ -119,7 +119,7 @@ class CustomersTableBase extends Component {
                     <td>
                         <div className="field has-addons">
                             <p className="control">
-                                <Link className="button is-info" to={"/customer/" + customer._id}>
+                                <Link className="button is-info" to={"/clientes/cliente/" + customer._id}>
                                     Ver/Editar
                                 </Link>
                             </p>
@@ -129,7 +129,7 @@ class CustomersTableBase extends Component {
                                 </button>
                             </p>
                             <p className="control">
-                                <Link className="button is-info" to={"/customer/" + customer._id + "/sales"}>
+                                <Link className="button is-info" to={"/clientes/cliente/" + customer._id + "/registro-de-ventas"}>
                                     Ver ventas
                                 </Link>
                             </p>
@@ -147,7 +147,7 @@ class CustomersTableBase extends Component {
             <div>
                 <div className="columns">
                     <div className="column has-text-centered">
-                        <Link className="button is-success" to="/nuevo-customer">Añadir nuevo cliente</Link>
+                        <Link className="button is-success" to="/clientes/nuevo-cliente">Añadir nuevo cliente</Link>
                     </div>
                     <div className="column has-text-centered">
                         <div className="control">
@@ -213,7 +213,6 @@ class CustomersTableBase extends Component {
                         </footer>
                     </div>
                 </div>
-
             </div>
         );
     }

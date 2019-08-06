@@ -16,7 +16,7 @@ const INITIAL_STATE = {
     searchFilter: ''
 }
 
-const SalesRecord = () => (
+const SalesRecord = ({ match }) => (
     <div>
         <section className="hero is-small is-primary">
             <div className="hero-body">
@@ -28,7 +28,7 @@ const SalesRecord = () => (
             </div>
         </section>
         <br></br>
-        <SalesRecordTable />
+        <SalesRecordTable customerId={match.params.customerId} />
     </div>
 );
 
@@ -51,23 +51,24 @@ class SalesRecordTableBase extends Component {
         const self = this;
         let sales = [];
         let totalGiven = 0, totalOnStock = 0, total = 0;
-        this.props.firebase.getSales().then((response) => {
-            response.forEach(doc => {
-                let sale = doc.data();
-                sale["_id"] = doc.id;
-                sales.push(sale);
-                totalGiven += parseInt(sale.amountGiven);
-                totalOnStock += parseInt(sale.amountOnStock);
-                total += parseInt(sale.totalToPay);
-            });
-            self.setState({
-                allSales: sales,
-                filteredAndSortedSales: sales,
-                totalGiven: totalGiven,
-                totalOnStock: totalOnStock,
-                total: total
-            });
-        })
+        this.props.firebase.getSalesByParameter("customerId", this.props.customerId)
+            .then((response) => {
+                response.forEach(doc => {
+                    let sale = doc.data();
+                    sale["_id"] = doc.id;
+                    sales.push(sale);
+                    totalGiven += parseInt(sale.amountGiven);
+                    totalOnStock += parseInt(sale.amountOnStock);
+                    total += parseInt(sale.totalToPay);
+                });
+                self.setState({
+                    allSales: sales,
+                    filteredAndSortedSales: sales,
+                    totalGiven: totalGiven,
+                    totalOnStock: totalOnStock,
+                    total: total
+                });
+            })
     }
 
     calculateTotal(sales, parameter) {
@@ -188,7 +189,9 @@ class SalesRecordTableBase extends Component {
                     <td>
                         <div className="field has-addons">
                             <p className="control">
-                                <Link className="button is-info" to={"/sale/" + sale._id}>
+                                <Link
+                                    className="button is-info"
+                                    to={"/clientes/cliente/" + this.props.customerId + "/registro-de-ventas/venta/" + sale._id}>
                                     Ver/Editar
                                 </Link>
                             </p>
@@ -212,7 +215,7 @@ class SalesRecordTableBase extends Component {
             <div>
                 <div className="columns">
                     <div className="column has-text-centered">
-                        <Link className="button is-success" to="/register-sale">Registrar nueva venta</Link>
+                        <Link className="button is-success" to={"/clientes/cliente/" + this.props.customerId + "/registro-de-ventas/nueva-venta"}>Registrar nueva venta</Link>
                     </div>
                     <div className="column has-text-centered">
                         <div className="control">
@@ -318,7 +321,6 @@ class SalesRecordTableBase extends Component {
                         </footer>
                     </div>
                 </div>
-
             </div>
         );
     }
