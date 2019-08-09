@@ -5,7 +5,8 @@ import { Link, withRouter } from "react-router-dom";
 const INITIAL_STATE = {
     email: '',
     password: '',
-    error: null
+    error: null,
+    isLoggingIn: false
 }
 
 const LoginPage = () => (
@@ -35,13 +36,15 @@ class LoginFormBase extends Component {
     handleSubmit(event) {
         const { email, password } = this.state;
         event.preventDefault();
-        this.props.firebase.login(email, password).then(() => {
-            this.setState({ ...INITIAL_STATE });
-            this.props.history.push("/");
+        this.setState({ isLoggingIn: true }, () => {
+            this.props.firebase.login(email, password).then(() => {
+                this.setState({ ...INITIAL_STATE });
+                this.props.history.push("/");
+            })
+                .catch(error => {
+                    this.setState({ error });
+                });
         })
-            .catch(error => {
-                this.setState({ error });
-            });
     }
 
     handleChange(event) {
@@ -49,7 +52,7 @@ class LoginFormBase extends Component {
     }
 
     render() {
-        const { email, password, error } = this.state;
+        const { email, password, error, isLoggingIn } = this.state;
         const isInvalid = password === '' || email === '';
         return (
             <div className="columns is-mobile">
@@ -83,12 +86,13 @@ class LoginFormBase extends Component {
                         </div>
                         <div className="field is-grouped">
                             <div className="control">
-                                <button disabled={isInvalid} type="submit" className="button is-info">Iniciar sesión</button>
+                                <button disabled={isInvalid || isLoggingIn} type="submit" className="button is-info">Iniciar sesión</button>
                             </div>
                             <div className="control">
-                                <Link to="/olvide-mi-contrasenia" className="button is-light">Olvidé mi contraseña</Link>
+                                <Link disabled={isLoggingIn} to="/olvide-mi-contrasenia" className="button is-light">Olvidé mi contraseña</Link>
                             </div>
                         </div>
+                        {isLoggingIn && <p>Iniciando sesión...</p>}
                         {error && <p>{error.message}</p>}
                     </form>
                 </div>

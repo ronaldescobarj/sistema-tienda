@@ -19,6 +19,9 @@ const INITIAL_STATE = {
     totalToPayOnOfferPrice: 0,
     totalToPay: 0,
     hasOffer: false,
+    isLoading: true,
+    isSavingChanges: false,
+    error: null
 }
 
 const EditSale = ({ match }) => (
@@ -61,13 +64,18 @@ class EditSaleFormBase extends Component {
     }
 
     getSale() {
-        const self = this;
         this.props.firebase.getSaleById(this.props.saleId).then((doc) => {
             if (doc.exists) {
-                self.setState(doc.data());
+                let sale = doc.data();
+                this.setState(sale, () => {
+                    this.setState({ isLoading: false });
+                });
             }
             else {
-                console.log("no existe");
+                this.setState({
+                    isLoading: false,
+                    error: "La venta no existe, o el cliente no existe, o hubo un error en la obtención de datos"
+                });
             }
         });
     }
@@ -90,10 +98,12 @@ class EditSaleFormBase extends Component {
             totalToPay: this.state.totalToPay
         };
         event.preventDefault();
-        this.props.firebase.updateSale(sale, this.props.saleId).then((response) => {
-            this.setState({ ...INITIAL_STATE });
-            this.props.history.push("/clientes/cliente/" + this.props.customerId + "/registro-de-ventas");
-        })
+        this.setState({ isSavingChanges: true }, () => {
+            this.props.firebase.updateSale(sale, this.props.saleId).then((response) => {
+                this.setState({ ...INITIAL_STATE });
+                this.props.history.push("/clientes/cliente/" + this.props.customerId + "/registro-de-ventas");
+            });
+        });
     }
 
     handleChange(event) {
@@ -121,7 +131,22 @@ class EditSaleFormBase extends Component {
     render() {
         const { date, model, code, color, amountGiven,
             amountOnStock, amountSoldAtRegularPrice, regularPrice, totalToPayOnRegularPrice,
-            amountSoldAtOfferPrice, offerPrice, totalToPayOnOfferPrice, totalToPay } = this.state;
+            amountSoldAtOfferPrice, offerPrice, totalToPayOnOfferPrice, totalToPay,
+            isLoading, isSavingChanges, error } = this.state;
+        if (isLoading) {
+            return (
+                <div>
+                    <progress className="progress is-small is-info" max="100">15%</progress>
+                </div>
+            );
+        }
+        if (error) {
+            return (
+                <div>
+                    <p>{error}</p>
+                </div>
+            )
+        }
         return (
             <div className="columns is-mobile">
                 <div className="column is-half is-offset-one-quarter">
@@ -242,7 +267,7 @@ class EditSaleFormBase extends Component {
                                 />
                             </div>
                         </div>
-                        
+
                         <div className="field">
                             <label className="label">Vendió (precio con oferta)</label>
                             <div className="control">
@@ -297,12 +322,13 @@ class EditSaleFormBase extends Component {
                         </div>
                         <div className="field is-grouped">
                             <div className="control">
-                                <button type="submit" className="button is-info">Guardar cambios</button>
+                                <button disabled={isSavingChanges} type="submit" className="button is-info">Guardar cambios</button>
                             </div>
                             <div className="control">
-                                <Link to="/inventario" className="button is-light">Cancelar</Link>
+                                <Link disabled={isSavingChanges} to="/inventario" className="button is-light">Cancelar</Link>
                             </div>
                         </div>
+                        {isSavingChanges && <p>Guardando cambios...</p>}
                     </form>
                 </div>
             </div >

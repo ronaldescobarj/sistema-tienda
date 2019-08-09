@@ -9,7 +9,8 @@ const INITIAL_STATE = {
     modalClass: "modal",
     idToDelete: '',
     sortDirection: 'ascendant',
-    searchFilter: ''
+    searchFilter: '',
+    isLoading: true
 }
 
 const CustomersList = () => (
@@ -44,7 +45,6 @@ class CustomersTableBase extends Component {
     }
 
     getData() {
-        const self = this;
         let customers = [];
         this.props.firebase.getCustomers().then((response) => {
             response.forEach(doc => {
@@ -52,7 +52,7 @@ class CustomersTableBase extends Component {
                 customer["_id"] = doc.id;
                 customers.push(customer);
             });
-            self.setState({ allCustomers: customers, filteredAndSortedCustomers: customers });
+            this.setState({ allCustomers: customers, filteredAndSortedCustomers: customers, isLoading: false });
         })
     }
 
@@ -139,7 +139,14 @@ class CustomersTableBase extends Component {
     }
 
     render() {
-        const { modalClass, sortDirection, searchFilter } = this.state;
+        const { modalClass, sortDirection, searchFilter, isLoading } = this.state;
+        if (isLoading) {
+            return (
+                <div>
+                    <progress className="progress is-small is-info" max="100">15%</progress>
+                </div>
+            );
+        }
         return (
             <div>
                 <div className="columns">

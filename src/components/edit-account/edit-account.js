@@ -7,7 +7,8 @@ const INITIAL_STATE = {
     passwordOne: '',
     passwordTwo: '',
     error: null,
-    showMessage: false
+    showMessage: false,
+    isUpdatingPassword: false
 }
 
 const EditAccount = () => (
@@ -37,12 +38,14 @@ class ChangePasswordFormBase extends Component {
     handleSubmit(event) {
         const { passwordOne } = this.state;
         event.preventDefault();
-        this.props.firebase.updatePassword(passwordOne).then(() => {
-            this.setState({ showMessage: true });
-        })
-            .catch(error => {
-                this.setState({ error });
-            });
+        this.setState({ isUpdatingPassword: true }, () => {
+            this.props.firebase.updatePassword(passwordOne).then(() => {
+                this.setState({ showMessage: true });
+            })
+                .catch(error => {
+                    this.setState({ error });
+                });
+        });
     }
 
     handleChange(event) {
@@ -50,7 +53,7 @@ class ChangePasswordFormBase extends Component {
     }
 
     render() {
-        const { passwordOne, passwordTwo, error, showMessage } = this.state;
+        const { passwordOne, passwordTwo, error, showMessage, isUpdatingPassword } = this.state;
 
         const isInvalid = passwordOne !== passwordTwo || passwordOne === '';
 
@@ -86,7 +89,7 @@ class ChangePasswordFormBase extends Component {
                                 </div>
                             </div>
                             <div className="control">
-                                <button disabled={isInvalid} type="submit" className="button is-info">Cambiar contraseña</button>
+                                <button disabled={isInvalid || isUpdatingPassword} type="submit" className="button is-info">Cambiar contraseña</button>
                             </div>
                             {error && <p>{error.message}</p>}
                         </form>

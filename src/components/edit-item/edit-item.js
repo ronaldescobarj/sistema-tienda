@@ -7,7 +7,10 @@ const INITIAL_STATE = {
     name: '',
     code: '',
     color: '',
-    amount: 0
+    amount: 0,
+    isLoading: true,
+    isSavingChanges: false,
+    error: null
 }
 
 const EditItem = ({ match }) => (
@@ -35,24 +38,40 @@ class EditItemFormBase extends Component {
     }
 
     componentDidMount() {
-        const self = this;
         this.props.firebase.getItemById(this.props.itemId).then((doc) => {
             if (doc.exists) {
-                self.setState(doc.data());
+                let item = doc.data();
+                this.setState({
+                    name: item.name,
+                    code: item.code,
+                    color: item.color,
+                    amount: item.amount,
+                    isLoading: false
+                });
             }
             else {
-                console.log("no existe");
+                this.setState({
+                    isLoading: false,
+                    error: "El elemento no existe o hubo algun error al obtenerlo"
+                });
             }
         });
     }
 
     handleSubmit(event) {
-        let item = this.state;
+        let item = {
+            name: this.state.name,
+            code: this.state.code,
+            color: this.state.color,
+            amount: this.state.amount
+        };
         event.preventDefault();
-        this.props.firebase.updateItem(item, this.props.itemId).then(() => {
-            this.setState({ ...INITIAL_STATE });
-            this.props.history.push("/inventario");
-        })
+        this.setState({ isSavingChanges: true }, () => {
+            this.props.firebase.updateItem(item, this.props.itemId).then(() => {
+                this.setState({ ...INITIAL_STATE });
+                this.props.history.push("/inventario");
+            });
+        });
     }
 
     handleChange(event) {
@@ -65,7 +84,21 @@ class EditItemFormBase extends Component {
     };
 
     render() {
-        const { name, code, color, amount } = this.state;
+        const { name, code, color, amount, isLoading, isSavingChanges, error } = this.state;
+        if (isLoading) {
+            return (
+                <div>
+                    <progress className="progress is-small is-info" max="100">15%</progress>
+                </div>
+            );
+        }
+        if (error) {
+            return (
+                <div>
+                    <p>{error}</p>
+                </div>
+            )
+        }
         return (
             <div className="columns is-mobile">
                 <div className="column is-half is-offset-one-quarter">
@@ -100,12 +133,13 @@ class EditItemFormBase extends Component {
                         </div>
                         <div className="field is-grouped">
                             <div className="control">
-                                <button type="submit" className="button is-info">Guardar</button>
+                                <button disabled={isSavingChanges} type="submit" className="button is-info">Guardar</button>
                             </div>
                             <div className="control">
-                                <Link to="/inventario" className="button is-light">Cancelar</Link>
+                                <Link disabled={isSavingChanges} to="/inventario" className="button is-light">Cancelar</Link>
                             </div>
                         </div>
+                        {isSavingChanges && <p>Guardando cambios...</p>}
                     </form>
                 </div>
             </div>

@@ -4,7 +4,10 @@ import { Link, withRouter } from "react-router-dom";
 import { withAuthorization } from '../session';
 
 const INITIAL_STATE = {
-    name: ''
+    name: '',
+    isLoading: true,
+    isSavingChanges: false,
+    error: null
 }
 
 const EditCustomer = ({ match }) => (
@@ -32,24 +35,30 @@ class EditCustomerFormBase extends Component {
     }
 
     componentDidMount() {
-        const self = this;
         this.props.firebase.getCustomerById(this.props.customerId).then((doc) => {
             if (doc.exists) {
-                self.setState(doc.data());
+                let customer = doc.data();
+                this.setState({ name: customer.name, isLoading: false });
             }
             else {
-                console.log("no existe");
+                this.setState({
+                    isLoading: false,
+                    error: "El cliente no está registrado o hubo algun error al obtenerlo"
+                });
             }
         });
     }
 
     handleSubmit(event) {
-        let customer = this.state;
+        let customer = { name: this.state.name };
         event.preventDefault();
-        this.props.firebase.updateCustomer(customer, this.props.customerId).then(() => {
-            this.setState({ ...INITIAL_STATE });
-            this.props.history.push("/clientes");
-        })
+        this.setState({ isSavingChanges: true }, () => {
+            this.props.firebase.updateCustomer(customer, this.props.customerId).then(() => {
+                this.setState({ ...INITIAL_STATE });
+                this.props.history.push("/clientes");
+            });
+        });
+
     }
 
     handleChange(event) {
@@ -57,7 +66,21 @@ class EditCustomerFormBase extends Component {
     };
 
     render() {
-        const { name } = this.state;
+        const { name, isLoading, isSavingChanges, error } = this.state;
+        if (isLoading) {
+            return (
+                <div>
+                    <progress className="progress is-small is-info" max="100">15%</progress>
+                </div>
+            );
+        }
+        if (error) {
+            return (
+                <div>
+                    <p>{error}</p>
+                </div>
+            )
+        }
         return (
             <div className="columns is-mobile">
                 <div className="column is-half is-offset-one-quarter">
@@ -71,12 +94,13 @@ class EditCustomerFormBase extends Component {
                         </div>
                         <div className="field is-grouped">
                             <div className="control">
-                                <button type="submit" className="button is-info">Guardar</button>
+                                <button disabled={isSavingChanges} type="submit" className="button is-info">Guardar</button>
                             </div>
                             <div className="control">
-                                <Link to="/clientes" className="button is-light">Cancelar</Link>
+                                <Link disabled={isSavingChanges} to="/clientes" className="button is-light">Cancelar</Link>
                             </div>
                         </div>
+                        {isSavingChanges && <p>Guardando cambios...</p>}
                     </form>
                 </div>
             </div>

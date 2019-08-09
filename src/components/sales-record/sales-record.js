@@ -13,7 +13,9 @@ const INITIAL_STATE = {
     idToDelete: '',
     parameterToSortBy: 'date',
     sortDirection: 'ascendant',
-    searchFilter: ''
+    searchFilter: '',
+    isLoading: true,
+    noSales: false
 }
 
 const SalesRecord = ({ match }) => (
@@ -48,26 +50,31 @@ class SalesRecordTableBase extends Component {
     }
 
     getData() {
-        const self = this;
         let sales = [];
         let totalGiven = 0, totalOnStock = 0, total = 0;
         this.props.firebase.getSalesByParameter("customerId", this.props.customerId)
             .then((response) => {
-                response.forEach(doc => {
-                    let sale = doc.data();
-                    sale["_id"] = doc.id;
-                    sales.push(sale);
-                    totalGiven += parseInt(sale.amountGiven);
-                    totalOnStock += parseInt(sale.amountOnStock);
-                    total += parseInt(sale.totalToPay);
-                });
-                self.setState({
-                    allSales: sales,
-                    filteredAndSortedSales: sales,
-                    totalGiven: totalGiven,
-                    totalOnStock: totalOnStock,
-                    total: total
-                });
+                if (!response.empty) {
+                    response.forEach(doc => {
+                        let sale = doc.data();
+                        sale["_id"] = doc.id;
+                        sales.push(sale);
+                        totalGiven += parseInt(sale.amountGiven);
+                        totalOnStock += parseInt(sale.amountOnStock);
+                        total += parseInt(sale.totalToPay);
+                    });
+                    this.setState({
+                        allSales: sales,
+                        filteredAndSortedSales: sales,
+                        totalGiven: totalGiven,
+                        totalOnStock: totalOnStock,
+                        total: total,
+                        isLoading: false
+                    });
+                }
+                else {
+                    this.setState({ isLoading: false, noSales: true });
+                }
             })
     }
 
@@ -210,7 +217,21 @@ class SalesRecordTableBase extends Component {
 
     render() {
         const { totalGiven, totalOnStock, total, modalClass, parameterToSortBy,
-            sortDirection, searchFilter } = this.state;
+            sortDirection, searchFilter, isLoading, noSales } = this.state;
+        if (isLoading) {
+            return (
+                <div>
+                    <progress className="progress is-small is-info" max="100">15%</progress>
+                </div>
+            );
+        }
+        if (noSales) {
+            return (
+                <div>
+                    <p>El cliente actual no tiene ventas registradas.</p>
+                </div>
+            );
+        }
         return (
             <div>
                 <div className="columns">

@@ -7,7 +7,8 @@ const INITIAL_STATE = {
     name: '',
     code: '',
     color: '',
-    amount: 0
+    amount: 0,
+    isSavingData: false
 }
 
 const AddItem = () => (
@@ -35,12 +36,20 @@ class AddItemFormBase extends Component {
     }
 
     handleSubmit(event) {
-        let item = this.state;
+        let item = {
+            name: this.state.name,
+            code: this.state.code,
+            color: this.state.color,
+            amount: this.state.amount
+        };
         event.preventDefault();
-        this.props.firebase.addItem(item).then((response) => {
-            this.setState({ ...INITIAL_STATE });
-            this.props.history.push("/inventario");
-        })
+        this.setState({ isSavingData: true }, () => {
+            this.props.firebase.addItem(item).then((response) => {
+                this.setState({ ...INITIAL_STATE });
+                this.props.history.push("/inventario");
+            });
+        });
+        
     }
 
     handleChange(event) {
@@ -53,7 +62,7 @@ class AddItemFormBase extends Component {
     };
 
     render() {
-        const { name, code, color, amount } = this.state;
+        const { name, code, color, amount, isSavingData } = this.state;
         return (
             <div className="columns is-mobile">
                 <div className="column is-half is-offset-one-quarter">
@@ -88,12 +97,13 @@ class AddItemFormBase extends Component {
                         </div>
                         <div className="field is-grouped">
                             <div className="control">
-                                <button type="submit" className="button is-info">Guardar</button>
+                                <button disabled={isSavingData} type="submit" className="button is-info">Guardar</button>
                             </div>
                             <div className="control">
-                                <Link to="/inventario" className="button is-light">Cancelar</Link>
+                                <Link disabled={isSavingData} to="/inventario" className="button is-light">Cancelar</Link>
                             </div>
                         </div>
+                        {isSavingData && <p>Guardando item...</p>}
                     </form>
                 </div>
             </div>

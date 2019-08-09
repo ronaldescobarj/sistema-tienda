@@ -11,7 +11,9 @@ const INITIAL_STATE = {
     idToDelete: '',
     parameterToSortBy: 'name',
     sortDirection: 'ascendant',
-    searchFilter: ''
+    searchFilter: '',
+    isLoading: true,
+    noItems: false
 }
 
 const Inventory = () => (
@@ -46,18 +48,27 @@ class InventoryTableBase extends Component {
     }
 
     getData() {
-        const self = this;
         let items = [];
         let total = 0;
         this.props.firebase.getItems().then((response) => {
-            response.forEach(doc => {
-                let item = doc.data();
-                item["_id"] = doc.id;
-                items.push(item);
-                total += parseInt(item.amount);
-            });
-            self.setState({ allItems: items, filteredAndSortedItems: items, total: total });
-        })
+            if (!response.empty) {
+                response.forEach(doc => {
+                    let item = doc.data();
+                    item["_id"] = doc.id;
+                    items.push(item);
+                    total += parseInt(item.amount);
+                });
+                this.setState({
+                    allItems: items,
+                    filteredAndSortedItems: items,
+                    total: total,
+                    isLoading: false
+                });
+            }
+            else {
+                this.setState({ noItems: true });
+            }
+        });
     }
 
     calculateTotal(items) {
@@ -163,7 +174,21 @@ class InventoryTableBase extends Component {
     }
 
     render() {
-        const { total, modalClass, parameterToSortBy, sortDirection, searchFilter } = this.state;
+        const { total, modalClass, parameterToSortBy, sortDirection, searchFilter, isLoading, noItems } = this.state;
+        if (isLoading) {
+            return (
+                <div>
+                    <progress className="progress is-small is-info" max="100">15%</progress>
+                </div>
+            );
+        }
+        if (noItems) {
+            return (
+                <div>
+                    <p>No hay items registrados.</p>
+                </div>
+            );
+        }
         return (
             <div>
                 <div className="columns">

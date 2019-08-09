@@ -5,7 +5,8 @@ import { Link } from "react-router-dom";
 const INITIAL_STATE = {
     email: '',
     error: null,
-    showMessage: false
+    showMessage: false,
+    isResettingPassword: false
 }
 
 const ForgotPassword = () => (
@@ -35,13 +36,14 @@ class ForgotPasswordFormBase extends Component {
     handleSubmit(event) {
         event.preventDefault();
         const { email } = this.state;
-        this.props.firebase.resetPassword(email).then(() => {
-            this.setState({ showMessage: true });
-        })
-            .catch(error => {
-                this.setState({ error });
-            });
-
+        this.setState({ isResettingPassword: true }, () => {
+            this.props.firebase.resetPassword(email).then(() => {
+                this.setState({ showMessage: true });
+            })
+                .catch(error => {
+                    this.setState({ error });
+                });
+        });
     }
 
     handleChange(event) {
@@ -50,7 +52,7 @@ class ForgotPasswordFormBase extends Component {
 
 
     render() {
-        const { email, error, showMessage } = this.state;
+        const { email, error, showMessage, isResettingPassword } = this.state;
 
         const isInvalid = email === '';
 
@@ -73,7 +75,7 @@ class ForgotPasswordFormBase extends Component {
                                 </div>
                             </div>
                             <div className="control">
-                                <button disabled={isInvalid} type="submit" className="button is-info">Restaurar contraseña</button>
+                                <button disabled={isInvalid || isResettingPassword} type="submit" className="button is-info">Restaurar contraseña</button>
                             </div>
                             {error && <p>{error.message}</p>}
                         </form>

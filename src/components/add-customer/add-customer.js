@@ -4,7 +4,8 @@ import { Link, withRouter } from "react-router-dom";
 import { withAuthorization } from '../session';
 
 const INITIAL_STATE = {
-    name: ''
+    name: '',
+    isSavingData: false
 }
 
 const AddCustomer = () => (
@@ -32,12 +33,14 @@ class AddCustomerFormBase extends Component {
     }
 
     handleSubmit(event) {
-        let customer = this.state;
+        let customer = { name: this.state.name };
         event.preventDefault();
-        this.props.firebase.addCustomer(customer).then((response) => {
-            this.setState({ ...INITIAL_STATE });
-            this.props.history.push("/clientes");
-        })
+        this.setState({ isSavingData: true }, () => {
+            this.props.firebase.addCustomer(customer).then((response) => {
+                this.setState({ ...INITIAL_STATE });
+                this.props.history.push("/clientes");
+            });
+        });
     }
 
     handleChange(event) {
@@ -45,7 +48,7 @@ class AddCustomerFormBase extends Component {
     };
 
     render() {
-        const { name } = this.state;
+        const { name, isSavingData } = this.state;
         return (
             <div className="columns is-mobile">
                 <div className="column is-half is-offset-one-quarter">
@@ -59,12 +62,13 @@ class AddCustomerFormBase extends Component {
                         </div>
                         <div className="field is-grouped">
                             <div className="control">
-                                <button type="submit" className="button is-info">Guardar</button>
+                                <button disabled={isSavingData} type="submit" className="button is-info">Guardar</button>
                             </div>
                             <div className="control">
-                                <Link to="/clientes" className="button is-light">Cancelar</Link>
+                                <Link disabled={isSavingData} to="/clientes" className="button is-light">Cancelar</Link>
                             </div>
                         </div>
+                        {isSavingData && <p>Guardando item...</p>}
                     </form>
                 </div>
             </div>

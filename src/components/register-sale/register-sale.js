@@ -21,7 +21,9 @@ const INITIAL_STATE = {
     hasOffer: false,
     models: [],
     selectedModel: null,
-    selectedColor: null
+    selectedColor: null,
+    isLoading: true,
+    isSavingData: false
 }
 
 const RegisterSale = ({ match }) => (
@@ -58,9 +60,9 @@ class RegisterSaleFormBase extends Component {
 
     getModels() {
         axios.get('https://us-central1-sistema-tienda-c6c67.cloudfunctions.net/getModelsWithColors')
-        .then(response => {
-            this.setState({ models: response.data });
-        })
+            .then(response => {
+                this.setState({ models: response.data, isLoading: false });
+            })
     }
 
     handleSubmit(event) {
@@ -81,10 +83,12 @@ class RegisterSaleFormBase extends Component {
             totalToPay: this.state.totalToPay
         };
         event.preventDefault();
-        this.props.firebase.registerSale(sale).then((response) => {
-            this.setState({ ...INITIAL_STATE });
-            this.props.history.push("/clientes/cliente/" + this.props.customerId + "/registro-de-ventas");
-        })
+        this.setState({ isSavingData: true }, () => {
+            this.props.firebase.registerSale(sale).then((response) => {
+                this.setState({ ...INITIAL_STATE });
+                this.props.history.push("/clientes/cliente/" + this.props.customerId + "/registro-de-ventas");
+            });
+        });
     }
 
     handleChange(event) {
@@ -119,7 +123,7 @@ class RegisterSaleFormBase extends Component {
                 totalToPay: total
             });
         });
-        
+
     }
 
     renderModelOptions() {
@@ -152,7 +156,15 @@ class RegisterSaleFormBase extends Component {
     render() {
         const { date, model, code, color, amountGiven,
             amountOnStock, amountSoldAtRegularPrice, regularPrice, totalToPayOnRegularPrice, hasOffer,
-            amountSoldAtOfferPrice, offerPrice, totalToPayOnOfferPrice, totalToPay } = this.state;
+            amountSoldAtOfferPrice, offerPrice, totalToPayOnOfferPrice, totalToPay, isLoading,
+            isSavingData } = this.state;
+        if (isLoading) {
+            return (
+                <div>
+                    <progress className="progress is-small is-info" max="100">15%</progress>
+                </div>
+            );
+        }
         return (
             <div className="columns is-mobile">
                 <div className="column is-half is-offset-one-quarter">
@@ -336,12 +348,13 @@ class RegisterSaleFormBase extends Component {
                         </div>
                         <div className="field is-grouped">
                             <div className="control">
-                                <button type="submit" className="button is-info">Guardar</button>
+                                <button disabled={isSavingData} type="submit" className="button is-info">Guardar</button>
                             </div>
                             <div className="control">
-                                <Link to="/inventario" className="button is-light">Cancelar</Link>
+                                <Link disabled={isSavingData} to="/inventario" className="button is-light">Cancelar</Link>
                             </div>
                         </div>
+                        {isSavingData && <p>Registrando venta...</p>}
                     </form>
                 </div>
             </div>
