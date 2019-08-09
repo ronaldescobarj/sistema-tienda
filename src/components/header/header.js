@@ -18,10 +18,10 @@ const Header = () => (
                 {authUser => authUser ? <div id="myNavbar" className="navbar-menu">
                     <div className="navbar-start">
                         <div className="navbar-item">
-                            <Link to="/inventario" className="button is-light is-outlined">Inventario</Link>
+                            <Link to="/inventario" className="button is-link">Inventario</Link>
                         </div>
                         <div className="navbar-item">
-                            <Link to="/registro-ventas" className="button is-light is-outlined">Registro de ventas</Link>
+                            <Link to="/clientes" className="button is-link">Ventas y clientes</Link>
                         </div>
                     </div>
                     <div className="navbar-end">

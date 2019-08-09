@@ -24,7 +24,7 @@ const INITIAL_STATE = {
     selectedColor: null
 }
 
-const RegisterSale = () => (
+const RegisterSale = ({ match }) => (
     <div>
         <section className="hero is-small is-primary">
             <div className="hero-body">
@@ -36,7 +36,7 @@ const RegisterSale = () => (
             </div>
         </section>
         <br></br>
-        <RegisterSaleForm />
+        <RegisterSaleForm customerId={match.params.customerId} />
     </div>
 );
 
@@ -65,6 +65,7 @@ class RegisterSaleFormBase extends Component {
 
     handleSubmit(event) {
         let sale = {
+            customerId: this.props.customerId,
             date: this.state.date,
             model: this.state.model,
             code: this.state.code,
@@ -82,7 +83,7 @@ class RegisterSaleFormBase extends Component {
         event.preventDefault();
         this.props.firebase.registerSale(sale).then((response) => {
             this.setState({ ...INITIAL_STATE });
-            this.props.history.push("/registro-de-ventas");
+            this.props.history.push("/clientes/cliente/" + this.props.customerId + "/registro-de-ventas");
         })
     }
 

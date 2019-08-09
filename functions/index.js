@@ -38,24 +38,40 @@ exports.discountFromInventory = functions.firestore
     .onCreate((snap, context) => {
         const sale = snap.data();
         db.collection("inventory")
-        .where("name", "==", sale.model)
-        .where("code", "==", sale.code)
-        .where("color", "==", sale.color)
-        .get().then((response) => {
-            let itemId, item;
-            response.forEach((element) => {
-                itemId = element.id;
-                item = element.data();
-            })
-            let updatedItem = item;
-            updatedItem.amount = updatedItem.amount - sale.amountGiven;
-            return db.collection("inventory").doc(itemId).set(updatedItem);
-        }).catch(error => error);
+            .where("name", "==", sale.model)
+            .where("code", "==", sale.code)
+            .where("color", "==", sale.color)
+            .get().then((response) => {
+                let itemId, item;
+                response.forEach((element) => {
+                    itemId = element.id;
+                    item = element.data();
+                })
+                let updatedItem = item;
+                updatedItem.amount = updatedItem.amount - sale.amountGiven;
+                return db.collection("inventory").doc(itemId).set(updatedItem);
+            }).catch(error => error);
     });
 
-// // Create and Deploy Your First Cloud Functions
-// // https://firebase.google.com/docs/functions/write-firebase-functions
-//
-// exports.helloWorld = functions.https.onRequest((request, response) => {
-//  response.send("Hello from Firebase!");
-// });
+
+exports.updateAmountOnInventory = functions.firestore
+    .document("sales/{saleId}")
+    .onUpdate((change, context) => {
+        const updatedSale = change.after.data();
+        const previousSale = change.before.data();
+        let amountToModify = updatedSale.amountGiven - previousSale.amountGiven;
+        db.collection("inventory")
+            .where("name", "==", updatedSale.model)
+            .where("code", "==", updatedSale.code)
+            .where("color", "==", updatedSale.color)
+            .get().then((response) => {
+                let itemId, item;
+                response.forEach((element) => {
+                    itemId = element.id;
+                    item = element.data();
+                })
+                let updatedItem = item;
+                updatedItem.amount = updatedItem.amount - amountToModify;
+                return db.collection("inventory").doc(itemId).set(updatedItem);
+            }).catch(error => error);
+    })
