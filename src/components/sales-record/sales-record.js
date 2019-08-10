@@ -227,8 +227,10 @@ class SalesRecordTableBase extends Component {
         }
         if (noSales) {
             return (
-                <div>
+                <div className="column has-text-centered">
                     <p>El cliente actual no tiene ventas registradas.</p>
+                    <br></br>
+                    <Link className="button is-success" to={"/clientes/cliente/" + this.props.customerId + "/registro-de-ventas/nueva-venta"}>Registrar nueva venta</Link>
                 </div>
             );
         }

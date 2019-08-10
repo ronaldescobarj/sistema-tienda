@@ -184,8 +184,10 @@ class InventoryTableBase extends Component {
         }
         if (noItems) {
             return (
-                <div>
+                <div className="column has-text-centered">
                     <p>No hay items registrados.</p>
+                    <br></br>
+                    <Link className="button is-success" to="/inventario/nuevo-item">Añadir nuevo item</Link>
                 </div>
             );
         }
