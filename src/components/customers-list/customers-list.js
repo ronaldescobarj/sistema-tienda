@@ -10,7 +10,8 @@ const INITIAL_STATE = {
     idToDelete: '',
     sortDirection: 'ascendant',
     searchFilter: '',
-    isLoading: true
+    isLoading: true,
+    noCustomers: false
 }
 
 const CustomersList = () => (
@@ -47,12 +48,17 @@ class CustomersTableBase extends Component {
     getData() {
         let customers = [];
         this.props.firebase.getCustomers().then((response) => {
-            response.forEach(doc => {
-                let customer = doc.data();
-                customer["_id"] = doc.id;
-                customers.push(customer);
-            });
-            this.setState({ allCustomers: customers, filteredAndSortedCustomers: customers, isLoading: false });
+            if (!response.empty) {
+                response.forEach(doc => {
+                    let customer = doc.data();
+                    customer["_id"] = doc.id;
+                    customers.push(customer);
+                });
+                this.setState({ allCustomers: customers, filteredAndSortedCustomers: customers, isLoading: false });
+            }
+            else {
+                this.setState({ noCustomers: true, isLoading: false });
+            }
         })
     }
 
@@ -139,11 +145,20 @@ class CustomersTableBase extends Component {
     }
 
     render() {
-        const { modalClass, sortDirection, searchFilter, isLoading } = this.state;
+        const { modalClass, sortDirection, searchFilter, isLoading, noCustomers } = this.state;
         if (isLoading) {
             return (
                 <div>
                     <progress className="progress is-small is-info" max="100">15%</progress>
+                </div>
+            );
+        }
+        if (noCustomers) {
+            return (
+                <div className="column has-text-centered">
+                    <p>No hay clientes registrados.</p>
+                    <br></br>
+                    <Link className="button is-success" to="/clientes/nuevo-cliente">Añadir nuevo cliente</Link>
                 </div>
             );
         }

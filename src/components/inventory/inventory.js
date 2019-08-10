@@ -66,7 +66,7 @@ class InventoryTableBase extends Component {
                 });
             }
             else {
-                this.setState({ noItems: true });
+                this.setState({ noItems: true, isLoading: false });
             }
         });
     }
