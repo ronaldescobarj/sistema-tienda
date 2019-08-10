@@ -73,7 +73,15 @@ class EditSaleFormBase extends Component {
             if (doc.exists) {
                 let sale = doc.data();
                 this.setState(sale, () => {
-                    this.setState({ isLoading: false });
+                    let selectedModel = this.getSelectedModel(sale, this.state.models);
+                    console.log(selectedModel);
+                    let selectedColor = this.getSelectedColor(sale.color, selectedModel);
+                    console.log(selectedColor);
+                    this.setState({
+                        selectedModel: selectedModel,
+                        selectedColor: selectedColor,
+                        isLoading: false
+                    });
                 });
             }
             else {
@@ -83,6 +91,14 @@ class EditSaleFormBase extends Component {
                 });
             }
         });
+    }
+
+    getSelectedModel(sale, models) {
+        return models.find(element => element.model === sale.model || element.code === sale.code);
+    }
+
+    getSelectedColor(color, selectedModel) {
+        return selectedModel.colors.find(element => element.color === color);
     }
 
     handleSubmit(event) {
@@ -175,6 +191,7 @@ class EditSaleFormBase extends Component {
             amountOnStock, amountSoldAtRegularPrice, regularPrice, totalToPayOnRegularPrice,
             amountSoldAtOfferPrice, offerPrice, totalToPayOnOfferPrice, totalToPay,
             isLoading, isSavingChanges, error } = this.state;
+        const isInvalid = model === '' || code === '' || color === '';
         if (isLoading) {
             return (
                 <div>
@@ -360,7 +377,7 @@ class EditSaleFormBase extends Component {
                         </div>
                         <div className="field is-grouped">
                             <div className="control">
-                                <button disabled={isSavingChanges} type="submit" className="button is-info">Guardar cambios</button>
+                                <button disabled={isSavingChanges || isInvalid} type="submit" className="button is-info">Guardar cambios</button>
                             </div>
                             <div className="control">
                                 <Link disabled={isSavingChanges} to="/inventario" className="button is-light">Cancelar</Link>

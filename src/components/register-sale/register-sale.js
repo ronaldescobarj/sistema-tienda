@@ -158,6 +158,7 @@ class RegisterSaleFormBase extends Component {
             amountOnStock, amountSoldAtRegularPrice, regularPrice, totalToPayOnRegularPrice, hasOffer,
             amountSoldAtOfferPrice, offerPrice, totalToPayOnOfferPrice, totalToPay, isLoading,
             isSavingData } = this.state;
+        const isInvalid = model === '' || code === '' || color === '';
         if (isLoading) {
             return (
                 <div>
@@ -348,7 +349,7 @@ class RegisterSaleFormBase extends Component {
                         </div>
                         <div className="field is-grouped">
                             <div className="control">
-                                <button disabled={isSavingData} type="submit" className="button is-info">Guardar</button>
+                                <button disabled={isSavingData || isInvalid} type="submit" className="button is-info">Guardar</button>
                             </div>
                             <div className="control">
                                 <Link disabled={isSavingData} to="/inventario" className="button is-light">Cancelar</Link>
