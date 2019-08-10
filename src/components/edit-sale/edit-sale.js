@@ -74,9 +74,7 @@ class EditSaleFormBase extends Component {
                 let sale = doc.data();
                 this.setState(sale, () => {
                     let selectedModel = this.getSelectedModel(sale, this.state.models);
-                    console.log(selectedModel);
                     let selectedColor = this.getSelectedColor(sale.color, selectedModel);
-                    console.log(selectedColor);
                     this.setState({
                         selectedModel: selectedModel,
                         selectedColor: selectedColor,
@@ -138,7 +136,7 @@ class EditSaleFormBase extends Component {
 
     changeModel(event) {
         let model = this.state.models.find(element => element[event.target.name] === event.target.value);
-        this.setState({ selectedModel: model, model: model.model, code: model.code });
+        this.setState({ selectedModel: model, model: model.model, code: model.code, selectedColor: null, color: '' });
     }
 
     changeColor(event) {
@@ -228,7 +226,6 @@ class EditSaleFormBase extends Component {
                             <div className="control">
                                 <div className="select">
                                     <select name="model" value={model} onChange={this.changeModel}>
-                                        <option value="-">-</option>
                                         {this.renderModelOptions()}
                                     </select>
                                 </div>
@@ -239,7 +236,6 @@ class EditSaleFormBase extends Component {
                             <div className="control">
                                 <div className="select">
                                     <select name="code" value={code} onChange={this.changeModel}>
-                                        <option value="-">-</option>
                                         {this.renderCodeOptions()}
                                     </select>
                                 </div>
@@ -250,7 +246,7 @@ class EditSaleFormBase extends Component {
                             <div className="control">
                                 <div className="select">
                                     <select name="color" value={color} onChange={this.changeColor}>
-                                        <option value="-">-</option>
+                                        {!this.state.selectedColor && <option value="">-</option>}
                                         {this.state.selectedModel && this.renderAvailableColorsForModel()}
                                     </select>
                                 </div>

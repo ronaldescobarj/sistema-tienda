@@ -104,7 +104,7 @@ class RegisterSaleFormBase extends Component {
 
     changeModel(event) {
         let model = this.state.models.find(element => element[event.target.name] === event.target.value);
-        this.setState({ selectedModel: model, model: model.model, code: model.code });
+        this.setState({ selectedModel: model, model: model.model, code: model.code, selectedColor: null, color: '' });
     }
 
     changeColor(event) {
@@ -188,7 +188,7 @@ class RegisterSaleFormBase extends Component {
                             <div className="control">
                                 <div className="select">
                                     <select name="model" value={model} onChange={this.changeModel}>
-                                        <option value="-">-</option>
+                                        {!this.state.selectedModel && <option value="">-</option>}
                                         {this.renderModelOptions()}
                                     </select>
                                 </div>
@@ -199,7 +199,7 @@ class RegisterSaleFormBase extends Component {
                             <div className="control">
                                 <div className="select">
                                     <select name="code" value={code} onChange={this.changeModel}>
-                                        <option value="-">-</option>
+                                        {!this.state.selectedModel && <option value="">-</option>}
                                         {this.renderCodeOptions()}
                                     </select>
                                 </div>
@@ -210,7 +210,7 @@ class RegisterSaleFormBase extends Component {
                             <div className="control">
                                 <div className="select">
                                     <select name="color" value={color} onChange={this.changeColor}>
-                                        <option value="-">-</option>
+                                        {!this.state.selectedColor && <option value="">-</option>}
                                         {this.state.selectedModel && this.renderAvailableColorsForModel()}
                                     </select>
                                 </div>
