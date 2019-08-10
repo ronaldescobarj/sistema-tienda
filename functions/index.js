@@ -35,43 +35,51 @@ exports.getModelsWithColors = functions.https.onRequest((req, res) => {
 
 exports.discountFromInventory = functions.firestore
     .document('sales/{saleId}')
-    .onCreate((snap, context) => {
+    .onCreate(async (snap, context) => {
         const sale = snap.data();
-        db.collection("inventory")
-            .where("name", "==", sale.model)
-            .where("code", "==", sale.code)
-            .where("color", "==", sale.color)
-            .get().then((response) => {
-                let itemId, item;
-                response.forEach((element) => {
-                    itemId = element.id;
-                    item = element.data();
-                })
-                let updatedItem = item;
-                updatedItem.amount = updatedItem.amount - sale.amountGiven;
-                return db.collection("inventory").doc(itemId).set(updatedItem);
-            }).catch(error => error);
+        let response = await db.collection("inventory").where("name", "==", sale.model).where("code", "==", sale.code).where("color", "==", sale.color).get();
+        let itemId, item;
+        response.forEach((element) => {
+            itemId = element.id;
+            item = element.data();
+        })
+        item.amount = item.amount - sale.amountGiven;
+        return await db.collection("inventory").doc(itemId).set(item);
     });
 
 
 exports.updateAmountOnInventory = functions.firestore
     .document("sales/{saleId}")
-    .onUpdate((change, context) => {
+    .onUpdate(async (change, context) => {
         const updatedSale = change.after.data();
         const previousSale = change.before.data();
-        let amountToModify = updatedSale.amountGiven - previousSale.amountGiven;
-        db.collection("inventory")
-            .where("name", "==", updatedSale.model)
-            .where("code", "==", updatedSale.code)
-            .where("color", "==", updatedSale.color)
-            .get().then((response) => {
-                let itemId, item;
-                response.forEach((element) => {
-                    itemId = element.id;
-                    item = element.data();
-                })
-                let updatedItem = item;
-                updatedItem.amount = updatedItem.amount - amountToModify;
-                return db.collection("inventory").doc(itemId).set(updatedItem);
-            }).catch(error => error);
+        if (updatedSale.code !== previousSale.code || updatedSale.model !== previousSale.model || updatedSale.color !== previousSale.color) {
+            let response = await db.collection("inventory").where("name", "==", previousSale.model).where("code", "==", previousSale.code).where("color", "==", previousSale.color).get();
+            let itemId, item;
+            response.forEach((element) => {
+                itemId = element.id;
+                item = element.data();
+            });
+            item.amount = item.amount + previousSale.amountGiven;
+            await db.collection("inventory").doc(itemId).set(item);
+            let newResponse = await db.collection("inventory").where("name", "==", updatedSale.model).where("code", "==", updatedSale.code).where("color", "==", updatedSale.color).get();
+            newResponse.forEach((element) => {
+                itemId = element.id;
+                item = element.data();
+            });
+            item.amount = item.amount - updatedSale.amountGiven;
+            return await db.collection("inventory").doc(itemId).set(item);
+        }
+        else {
+            let amountToModify = updatedSale.amountGiven - previousSale.amountGiven;
+            let response = await db.collection("inventory").where("name", "==", updatedSale.model).where("code", "==", updatedSale.code).where("color", "==", updatedSale.color).get();
+            let itemId, item;
+            response.forEach((element) => {
+                itemId = element.id;
+                item = element.data();
+            })
+            item.amount = item.amount - amountToModify;
+            return await db.collection("inventory").doc(itemId).set(item);
+        }
+
     })

@@ -19,6 +19,9 @@ const INITIAL_STATE = {
     totalToPayOnOfferPrice: 0,
     totalToPay: 0,
     hasOffer: false,
+    models: [],
+    selectedModel: null,
+    selectedColor: null,
     isLoading: true,
     isSavingChanges: false,
     error: null
@@ -47,6 +50,8 @@ class EditSaleFormBase extends Component {
         this.handleSubmit = this.handleSubmit.bind(this);
         this.handleChange = this.handleChange.bind(this);
         this.getModels = this.getModels.bind(this);
+        this.changeModel = this.changeModel.bind(this);
+        this.changeColor = this.changeColor.bind(this);
         this.recalculateTotal = this.recalculateTotal.bind(this);
     }
 
@@ -115,6 +120,16 @@ class EditSaleFormBase extends Component {
         this.setState({ [event.target.name]: value });
     }
 
+    changeModel(event) {
+        let model = this.state.models.find(element => element[event.target.name] === event.target.value);
+        this.setState({ selectedModel: model, model: model.model, code: model.code });
+    }
+
+    changeColor(event) {
+        let color = this.state.selectedModel.colors.find(col => col.color === event.target.value);
+        this.setState({ selectedColor: color, color: color.color });
+    }
+
     recalculateTotal(event) {
         this.setState({ [event.target.name]: parseInt(event.target.value) }, () => {
             let regularPriceTotal = this.state.regularPrice * this.state.amountSoldAtRegularPrice;
@@ -126,6 +141,33 @@ class EditSaleFormBase extends Component {
                 totalToPay: total
             });
         });
+    }
+
+    renderModelOptions() {
+        let modelOptions = this.state.models.map((item, index) => {
+            return (
+                <option key={index} value={item.model}>{item.model}</option>
+            )
+        });
+        return modelOptions;
+    }
+
+    renderCodeOptions() {
+        let codeOptions = this.state.models.map((item, index) => {
+            return (
+                <option key={index} value={item.code}>{item.code}</option>
+            )
+        })
+        return codeOptions;
+    }
+
+    renderAvailableColorsForModel() {
+        let colors = this.state.selectedModel.colors.map((color, index) => {
+            return (
+                <option key={index} value={color.color}>{color.color}</option>
+            )
+        })
+        return colors;
     }
 
     render() {
@@ -167,41 +209,37 @@ class EditSaleFormBase extends Component {
                         <div className="field">
                             <label className="label">Modelo</label>
                             <div className="control">
-                                <input
-                                    className="input"
-                                    type="text"
-                                    name="model"
-                                    value={model}
-                                    disabled
-                                />
+                                <div className="select">
+                                    <select name="model" value={model} onChange={this.changeModel}>
+                                        <option value="-">-</option>
+                                        {this.renderModelOptions()}
+                                    </select>
+                                </div>
                             </div>
                         </div>
                         <div className="field">
                             <label className="label">Código</label>
                             <div className="control">
-                                <input
-                                    className="input"
-                                    type="text"
-                                    name="code"
-                                    value={code}
-                                    disabled
-                                />
+                                <div className="select">
+                                    <select name="code" value={code} onChange={this.changeModel}>
+                                        <option value="-">-</option>
+                                        {this.renderCodeOptions()}
+                                    </select>
+                                </div>
                             </div>
                         </div>
                         <div className="field">
                             <label className="label">Color</label>
                             <div className="control">
-                                <div className="control">
-                                    <input
-                                        className="input"
-                                        type="text"
-                                        name="color"
-                                        value={color}
-                                        disabled
-                                    />
+                                <div className="select">
+                                    <select name="color" value={color} onChange={this.changeColor}>
+                                        <option value="-">-</option>
+                                        {this.state.selectedModel && this.renderAvailableColorsForModel()}
+                                    </select>
                                 </div>
                             </div>
                         </div>
+                        {this.state.selectedColor && <p>Cantidad disponible de ese color {this.state.selectedColor.amount}</p>}
                         <div className="field">
                             <label className="label">Se le dió</label>
                             <div className="control">
