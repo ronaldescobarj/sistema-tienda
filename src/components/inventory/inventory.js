@@ -13,6 +13,7 @@ const INITIAL_STATE = {
     sortDirection: 'ascendant',
     searchFilter: '',
     isLoading: true,
+    isDeleting: false,
     noItems: false
 }
 
@@ -79,10 +80,6 @@ class InventoryTableBase extends Component {
         return total;
     }
 
-    openModal(id) {
-        this.setState({ modalClass: "modal is-active", idToDelete: id })
-    }
-
     modifyStateOfItems(event) {
         this.setState({ [event.target.name]: event.target.value }, () => {
             let { allItems, parameterToSortBy, sortDirection, searchFilter } = this.state;
@@ -108,19 +105,6 @@ class InventoryTableBase extends Component {
         return filteredItems;
     }
 
-    deleteItem() {
-        let idToDelete = this.state.idToDelete;
-        this.props.firebase.deleteItem(idToDelete).then(() => {
-            let { allItems, parameterToSortBy, sortDirection, searchFilter } = this.state;
-            allItems = allItems.filter(element => element._id !== idToDelete);
-            let filteredItems = this.filterItems(searchFilter, allItems);
-            let sortedItems = this.sortItems(filteredItems, parameterToSortBy, sortDirection);
-            let total = this.calculateTotal(sortedItems);
-            this.setState({ allItems: allItems, filteredAndSortedItems: sortedItems, total: total });
-            this.closeModal();
-        });
-    }
-
     sortItems(items, parameter, sortDirection) {
         let isAscendant = sortDirection === 'ascendant';
         items.sort((first, second) => {
@@ -131,6 +115,25 @@ class InventoryTableBase extends Component {
             return 0;
         });
         return items;
+    }
+
+    deleteItem() {
+        let idToDelete = this.state.idToDelete;
+        this.setState({ isDeleting: true }, () => {
+            this.props.firebase.deleteItem(idToDelete).then(() => {
+                let { allItems, parameterToSortBy, sortDirection, searchFilter } = this.state;
+                allItems = allItems.filter(element => element._id !== idToDelete);
+                let filteredItems = this.filterItems(searchFilter, allItems);
+                let sortedItems = this.sortItems(filteredItems, parameterToSortBy, sortDirection);
+                let total = this.calculateTotal(sortedItems);
+                this.setState({ allItems: allItems, filteredAndSortedItems: sortedItems, total: total, isDeleting: false });
+                this.closeModal();
+            });
+        })
+    }
+
+    openModal(id) {
+        this.setState({ modalClass: "modal is-active", idToDelete: id })
     }
 
     closeModal() {
@@ -174,7 +177,8 @@ class InventoryTableBase extends Component {
     }
 
     render() {
-        const { total, modalClass, parameterToSortBy, sortDirection, searchFilter, isLoading, noItems } = this.state;
+        const { total, modalClass, parameterToSortBy, sortDirection, searchFilter, isLoading,
+            isDeleting, noItems } = this.state;
         if (isLoading) {
             return (
                 <div>
@@ -284,8 +288,9 @@ class InventoryTableBase extends Component {
                             ¿Está seguro de que desea eliminar el elemento?
                         </section>
                         <footer className="modal-card-foot">
-                            <button className="button is-danger" onClick={this.deleteItem}>Eliminar</button>
-                            <button className="button" onClick={this.closeModal}>Cancelar</button>
+                            <button disabled={isDeleting} className="button is-danger" onClick={this.deleteItem}>Eliminar</button>
+                            <button disabled={isDeleting} className="button" onClick={this.closeModal}>Cancelar</button>
+                            {isDeleting && <p>Eliminando item...</p>}
                         </footer>
                     </div>
                 </div>

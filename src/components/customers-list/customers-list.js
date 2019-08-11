@@ -11,6 +11,7 @@ const INITIAL_STATE = {
     sortDirection: 'ascendant',
     searchFilter: '',
     isLoading: true,
+    isDeleting: false,
     noCustomers: false
 }
 
@@ -62,10 +63,6 @@ class CustomersTableBase extends Component {
         })
     }
 
-    openModal(id) {
-        this.setState({ modalClass: "modal is-active", idToDelete: id })
-    }
-
     modifyStateOfCustomers(event) {
         this.setState({ [event.target.name]: event.target.value }, () => {
             let { allCustomers, sortDirection, searchFilter } = this.state;
@@ -98,14 +95,20 @@ class CustomersTableBase extends Component {
 
     deleteCustomer() {
         let idToDelete = this.state.idToDelete;
-        this.props.firebase.deleteCustomer(idToDelete).then(() => {
-            let { allCustomers, sortDirection, searchFilter } = this.state;
-            allCustomers = allCustomers.filter(element => element._id !== idToDelete);
-            let filteredCustomers = this.filterCustomers(searchFilter, allCustomers);
-            let sortedCustomers = this.sortCustomers(filteredCustomers, sortDirection);
-            this.setState({ allCustomers: allCustomers, filteredAndSortedCustomers: sortedCustomers });
-            this.closeModal();
-        });
+        this.setState({ isDeleting: true }, () => {
+            this.props.firebase.deleteCustomer(idToDelete).then(() => {
+                let { allCustomers, sortDirection, searchFilter } = this.state;
+                allCustomers = allCustomers.filter(element => element._id !== idToDelete);
+                let filteredCustomers = this.filterCustomers(searchFilter, allCustomers);
+                let sortedCustomers = this.sortCustomers(filteredCustomers, sortDirection);
+                this.setState({ allCustomers: allCustomers, filteredAndSortedCustomers: sortedCustomers, isDeleting: false });
+                this.closeModal();
+            });
+        })
+    }
+
+    openModal(id) {
+        this.setState({ modalClass: "modal is-active", idToDelete: id })
     }
 
     closeModal() {
@@ -145,7 +148,7 @@ class CustomersTableBase extends Component {
     }
 
     render() {
-        const { modalClass, sortDirection, searchFilter, isLoading, noCustomers } = this.state;
+        const { modalClass, sortDirection, searchFilter, isLoading, isDeleting, noCustomers } = this.state;
         if (isLoading) {
             return (
                 <div>
@@ -227,8 +230,9 @@ class CustomersTableBase extends Component {
                             ¿Está seguro de que desea eliminar al cliente?
                         </section>
                         <footer className="modal-card-foot">
-                            <button className="button is-danger" onClick={this.deleteCustomer}>Eliminar</button>
-                            <button className="button" onClick={this.closeModal}>Cancelar</button>
+                            <button disabled={isDeleting} className="button is-danger" onClick={this.deleteCustomer}>Eliminar</button>
+                            <button disabled={isDeleting} className="button" onClick={this.closeModal}>Cancelar</button>
+                            {isDeleting && <p>Eliminando cliente...</p>}
                         </footer>
                     </div>
                 </div>

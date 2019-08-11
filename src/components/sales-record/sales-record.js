@@ -15,6 +15,7 @@ const INITIAL_STATE = {
     sortDirection: 'ascendant',
     searchFilter: '',
     isLoading: true,
+    isDeleting: false,
     noSales: false
 }
 
@@ -86,10 +87,6 @@ class SalesRecordTableBase extends Component {
         return total;
     }
 
-    openModal(id) {
-        this.setState({ modalClass: "modal is-active", idToDelete: id })
-    }
-
     modifyStateOfSales(event) {
         this.setState({ [event.target.name]: event.target.value }, () => {
             let { allSales, parameterToSortBy, sortDirection, searchFilter } = this.state;
@@ -122,27 +119,6 @@ class SalesRecordTableBase extends Component {
         return filteredSales;
     }
 
-    deleteSale() {
-        let idToDelete = this.state.idToDelete;
-        this.props.firebase.deleteSale(idToDelete).then(() => {
-            let { allSales, parameterToSortBy, sortDirection, searchFilter } = this.state;
-            allSales = allSales.filter(element => element._id !== idToDelete);
-            let filteredSales = this.filterSales(searchFilter, allSales);
-            let sortedSales = this.sortSales(filteredSales, parameterToSortBy, sortDirection);
-            let totalGiven = this.calculateTotal(sortedSales, "amountGiven");
-            let totalOnStock = this.calculateTotal(sortedSales, "amountOnStock");
-            let total = this.calculateTotal(sortedSales, "totalToPay");
-            this.setState({
-                allSales: allSales,
-                filteredAndSortedSales: sortedSales,
-                totalGiven: totalGiven,
-                totalOnStock: totalOnStock,
-                total: total
-            });
-            this.closeModal();
-        });
-    }
-
     sortSales(sales, parameter, sortDirection) {
         let isAscendant = sortDirection === 'ascendant';
         sales.sort((first, second) => {
@@ -153,6 +129,34 @@ class SalesRecordTableBase extends Component {
             return 0;
         });
         return sales;
+    }
+
+    deleteSale() {
+        let idToDelete = this.state.idToDelete;
+        this.setState({ isDeleting: true }, () => {
+            this.props.firebase.deleteSale(idToDelete).then(() => {
+                let { allSales, parameterToSortBy, sortDirection, searchFilter } = this.state;
+                allSales = allSales.filter(element => element._id !== idToDelete);
+                let filteredSales = this.filterSales(searchFilter, allSales);
+                let sortedSales = this.sortSales(filteredSales, parameterToSortBy, sortDirection);
+                let totalGiven = this.calculateTotal(sortedSales, "amountGiven");
+                let totalOnStock = this.calculateTotal(sortedSales, "amountOnStock");
+                let total = this.calculateTotal(sortedSales, "totalToPay");
+                this.setState({
+                    allSales: allSales,
+                    filteredAndSortedSales: sortedSales,
+                    totalGiven: totalGiven,
+                    totalOnStock: totalOnStock,
+                    total: total,
+                    isDeleting: false
+                });
+                this.closeModal();
+            });
+        });
+    }
+
+    openModal(id) {
+        this.setState({ modalClass: "modal is-active", idToDelete: id })
     }
 
     closeModal() {
@@ -217,7 +221,7 @@ class SalesRecordTableBase extends Component {
 
     render() {
         const { totalGiven, totalOnStock, total, modalClass, parameterToSortBy,
-            sortDirection, searchFilter, isLoading, noSales } = this.state;
+            sortDirection, searchFilter, isLoading, isDeleting, noSales } = this.state;
         if (isLoading) {
             return (
                 <div>
@@ -339,8 +343,9 @@ class SalesRecordTableBase extends Component {
                             ¿Está seguro de que desea eliminar la venta?
                         </section>
                         <footer className="modal-card-foot">
-                            <button className="button is-danger" onClick={this.deleteSale}>Eliminar</button>
-                            <button className="button" onClick={this.closeModal}>Cancelar</button>
+                            <button disabled={isDeleting} className="button is-danger" onClick={this.deleteSale}>Eliminar</button>
+                            <button disabled={isDeleting} className="button" onClick={this.closeModal}>Cancelar</button>
+                            {isDeleting && <p>Eliminando venta...</p>}
                         </footer>
                     </div>
                 </div>
