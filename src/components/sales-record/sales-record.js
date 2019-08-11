@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import { withFirebase } from '../firebase';
 import { Link } from "react-router-dom";
 import { withAuthorization } from '../session';
+import axios from 'axios';
 
 const INITIAL_STATE = {
     allSales: [],
@@ -16,7 +17,9 @@ const INITIAL_STATE = {
     searchFilter: '',
     isLoading: true,
     isDeleting: false,
-    noSales: false
+    noSales: false,
+    message: '',
+    shouldUpdateInventory: false
 }
 
 const SalesRecord = ({ match }) => (
@@ -44,39 +47,42 @@ class SalesRecordTableBase extends Component {
         this.closeModal = this.closeModal.bind(this);
         this.deleteSale = this.deleteSale.bind(this);
         this.modifyStateOfSales = this.modifyStateOfSales.bind(this);
+        this.toggleInventoryUpdateWhenDeleting = this.toggleInventoryUpdateWhenDeleting.bind(this);
     }
 
-    componentDidMount() {
-        this.getData();
+    async componentDidMount() {
+        await this.getData();
     }
 
-    getData() {
+    async getData() {
         let sales = [];
         let totalGiven = 0, totalOnStock = 0, total = 0;
-        this.props.firebase.getSalesByParameter("customerId", this.props.customerId)
-            .then((response) => {
-                if (!response.empty) {
-                    response.forEach(doc => {
-                        let sale = doc.data();
-                        sale["_id"] = doc.id;
-                        sales.push(sale);
-                        totalGiven += parseInt(sale.amountGiven);
-                        totalOnStock += parseInt(sale.amountOnStock);
-                        total += parseInt(sale.totalToPay);
-                    });
-                    this.setState({
-                        allSales: sales,
-                        filteredAndSortedSales: sales,
-                        totalGiven: totalGiven,
-                        totalOnStock: totalOnStock,
-                        total: total,
-                        isLoading: false
-                    });
-                }
-                else {
-                    this.setState({ isLoading: false, noSales: true });
-                }
-            })
+        let response = await this.props.firebase.getSalesByParameter("customerId", this.props.customerId);
+        if (!response.empty) {
+            response.forEach(doc => {
+                let sale = doc.data();
+                sale["_id"] = doc.id;
+                sales.push(sale);
+                totalGiven += parseInt(sale.amountGiven);
+                totalOnStock += parseInt(sale.amountOnStock);
+                total += parseInt(sale.totalToPay);
+            });
+            this.setState({
+                allSales: sales,
+                filteredAndSortedSales: sales,
+                totalGiven: totalGiven,
+                totalOnStock: totalOnStock,
+                total: total,
+                isLoading: false
+            });
+        }
+        else {
+            this.setState({ isLoading: false, noSales: true });
+        }
+    }
+
+    getSale(sales, id) {
+        return sales.find(sale => sale._id === id);
     }
 
     calculateTotal(sales, parameter) {
@@ -87,21 +93,24 @@ class SalesRecordTableBase extends Component {
         return total;
     }
 
-    modifyStateOfSales(event) {
-        this.setState({ [event.target.name]: event.target.value }, () => {
-            let { allSales, parameterToSortBy, sortDirection, searchFilter } = this.state;
-            let filteredSales = this.filterSales(searchFilter, allSales);
-            let sortedSales = this.sortSales(filteredSales, parameterToSortBy, sortDirection);
-            let totalGiven = this.calculateTotal(sortedSales, "amountGiven");
-            let totalOnStock = this.calculateTotal(sortedSales, "amountOnStock");
-            let total = this.calculateTotal(sortedSales, "totalToPay");
-            this.setState({
-                filteredAndSortedSales: sortedSales,
-                totalGiven: totalGiven,
-                totalOnStock: totalOnStock,
-                total: total
-            });
-        })
+    toggleInventoryUpdateWhenDeleting(event) {
+        this.setState({ shouldUpdateInventory: event.target.checked });
+    }
+
+    async modifyStateOfSales(event) {
+        await this.setState({ [event.target.name]: event.target.value });
+        let { allSales, parameterToSortBy, sortDirection, searchFilter } = this.state;
+        let filteredSales = this.filterSales(searchFilter, allSales);
+        let sortedSales = this.sortSales(filteredSales, parameterToSortBy, sortDirection);
+        let totalGiven = this.calculateTotal(sortedSales, "amountGiven");
+        let totalOnStock = this.calculateTotal(sortedSales, "amountOnStock");
+        let total = this.calculateTotal(sortedSales, "totalToPay");
+        this.setState({
+            filteredAndSortedSales: sortedSales,
+            totalGiven: totalGiven,
+            totalOnStock: totalOnStock,
+            total: total
+        });
     }
 
     filterSales(searchTerm, salesList) {
@@ -131,28 +140,33 @@ class SalesRecordTableBase extends Component {
         return sales;
     }
 
-    deleteSale() {
+    async deleteSale() {
         let idToDelete = this.state.idToDelete;
-        this.setState({ isDeleting: true }, () => {
-            this.props.firebase.deleteSale(idToDelete).then(() => {
-                let { allSales, parameterToSortBy, sortDirection, searchFilter } = this.state;
-                allSales = allSales.filter(element => element._id !== idToDelete);
-                let filteredSales = this.filterSales(searchFilter, allSales);
-                let sortedSales = this.sortSales(filteredSales, parameterToSortBy, sortDirection);
-                let totalGiven = this.calculateTotal(sortedSales, "amountGiven");
-                let totalOnStock = this.calculateTotal(sortedSales, "amountOnStock");
-                let total = this.calculateTotal(sortedSales, "totalToPay");
-                this.setState({
-                    allSales: allSales,
-                    filteredAndSortedSales: sortedSales,
-                    totalGiven: totalGiven,
-                    totalOnStock: totalOnStock,
-                    total: total,
-                    isDeleting: false
-                });
-                this.closeModal();
+        await this.setState({ isDeleting: true });
+        let response = await axios.delete('https://us-central1-sistema-tienda-c6c67.cloudfunctions.net/deleteSale',
+            {
+                data: {
+                    shouldUpdateInventory: this.state.shouldUpdateInventory,
+                    sale: this.getSale(this.state.allSales, idToDelete)
+                }
             });
+        let { allSales, parameterToSortBy, sortDirection, searchFilter } = this.state;
+        allSales = allSales.filter(element => element._id !== idToDelete);
+        let filteredSales = this.filterSales(searchFilter, allSales);
+        let sortedSales = this.sortSales(filteredSales, parameterToSortBy, sortDirection);
+        let totalGiven = this.calculateTotal(sortedSales, "amountGiven");
+        let totalOnStock = this.calculateTotal(sortedSales, "amountOnStock");
+        let total = this.calculateTotal(sortedSales, "totalToPay");
+        await this.setState({
+            allSales: allSales,
+            filteredAndSortedSales: sortedSales,
+            totalGiven: totalGiven,
+            totalOnStock: totalOnStock,
+            total: total,
+            isDeleting: false,
+            message: response.data.error ? response.data.error : ''
         });
+        this.closeModal();
     }
 
     openModal(id) {
@@ -221,7 +235,8 @@ class SalesRecordTableBase extends Component {
 
     render() {
         const { totalGiven, totalOnStock, total, modalClass, parameterToSortBy,
-            sortDirection, searchFilter, isLoading, isDeleting, noSales } = this.state;
+            sortDirection, searchFilter, isLoading, isDeleting, noSales, shouldUpdateInventory,
+        message } = this.state;
         if (isLoading) {
             return (
                 <div>
@@ -341,6 +356,19 @@ class SalesRecordTableBase extends Component {
                         </header>
                         <section className="modal-card-body">
                             ¿Está seguro de que desea eliminar la venta?
+                            <br></br>
+                            <br></br>
+                            <div className="control">
+                                <label className="checkbox">
+                                    <input
+                                        type="checkbox"
+                                        name="hasOffer"
+                                        checked={shouldUpdateInventory}
+                                        onChange={this.toggleInventoryUpdateWhenDeleting}
+                                    />
+                                    Actualizar cantidad del inventario al eliminar venta
+                                </label>
+                            </div>
                         </section>
                         <footer className="modal-card-foot">
                             <button disabled={isDeleting} className="button is-danger" onClick={this.deleteSale}>Eliminar</button>
@@ -349,6 +377,7 @@ class SalesRecordTableBase extends Component {
                         </footer>
                     </div>
                 </div>
+                {message && <p>{message}</p>}
             </div>
         );
     }
