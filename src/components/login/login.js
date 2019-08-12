@@ -33,18 +33,28 @@ class LoginFormBase extends Component {
         this.handleChange = this.handleChange.bind(this);
     }
 
-    handleSubmit(event) {
+    async handleSubmit(event) {
         const { email, password } = this.state;
         event.preventDefault();
-        this.setState({ isLoggingIn: true }, () => {
-            this.props.firebase.login(email, password).then(() => {
-                this.setState({ ...INITIAL_STATE });
-                this.props.history.push("/");
-            })
-                .catch(error => {
-                    this.setState({ error });
-                });
+        await this.setState({ isLoggingIn: true });
+        this.props.firebase.login(email, password).then(() => {
+            this.setState({ ...INITIAL_STATE });
+            this.props.history.push("/");
         })
+            .catch(error => {
+                this.setState({ error: this.translateErrorMessage(error), isLoggingIn: false });
+            });
+    }
+
+    translateErrorMessage(error) {
+        switch(error.code) {
+            case "auth/user-not-found":
+                return "No existe un usuario registrado con este correo electrónico.";
+            case "auth/wrong-password":
+                return "Contraseña incorrecta.";
+            default:
+                return "Error al iniciar sesión.";
+        }
     }
 
     handleChange(event) {
@@ -59,7 +69,7 @@ class LoginFormBase extends Component {
                 <div className="column is-half is-offset-one-quarter">
                     <form onSubmit={this.handleSubmit}>
                         <div className="field">
-                            <label className="label">Nombre</label>
+                            <label className="label">Correo electrónico</label>
                             <div className="control">
                                 <input
                                     className="input"
@@ -72,7 +82,7 @@ class LoginFormBase extends Component {
                             </div>
                         </div>
                         <div className="field">
-                            <label className="label">Código</label>
+                            <label className="label">Contraseña</label>
                             <div className="control">
                                 <input
                                     className="input"
@@ -93,7 +103,7 @@ class LoginFormBase extends Component {
                             </div>
                         </div>
                         {isLoggingIn && <p>Iniciando sesión...</p>}
-                        {error && <p>{error.message}</p>}
+                        {error && <p>{error}</p>}
                     </form>
                 </div>
             </div>
