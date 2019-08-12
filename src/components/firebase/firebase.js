@@ -22,7 +22,7 @@ class Firebase {
 
     //INVENTORY
     getItems() {
-        return this.db.collection("inventory").get();
+        return this.db.collection("inventory").orderBy("name").get();
     }
 
     getItemById(id) {
@@ -47,7 +47,7 @@ class Firebase {
 
     //SALES
     getSales() {
-        return this.db.collection("sales").get();
+        return this.db.collection("sales").orderBy("date").get();
     }
 
     getSaleById(id) {
@@ -72,7 +72,7 @@ class Firebase {
 
     //CUSTOMERS
     getCustomers() {
-        return this.db.collection("customers").get();
+        return this.db.collection("customers").orderBy("name").get();
     }
 
     getCustomerById(id) {
