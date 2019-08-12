@@ -126,18 +126,18 @@ class CustomersTableBase extends Component {
                         <div className="field has-addons">
                             <p className="control">
                                 <Link className="button is-info" to={"/clientes/cliente/" + customer._id}>
-                                    Ver/Editar
+                                    Cambiar nombre
+                                </Link>
+                            </p>
+                            <p className="control">
+                                <Link className="button is-success" to={"/clientes/cliente/" + customer._id + "/registro-de-ventas"}>
+                                    Ver ventas
                                 </Link>
                             </p>
                             <p className="control">
                                 <button onClick={() => this.openModal(customer._id)} className="button is-danger">
                                     Eliminar
                                 </button>
-                            </p>
-                            <p className="control">
-                                <Link className="button is-info" to={"/clientes/cliente/" + customer._id + "/registro-de-ventas"}>
-                                    Ver ventas
-                                </Link>
                             </p>
                         </div>
                     </td>
