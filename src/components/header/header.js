@@ -23,6 +23,9 @@ const Header = () => (
                         <div className="navbar-item">
                             <Link to="/clientes" className="button is-link">Ventas y clientes</Link>
                         </div>
+                        <div className="navbar-item">
+                            <Link to="/" className="button is-link">Ver guía</Link>
+                        </div>
                     </div>
                     <div className="navbar-end">
                         <div className="navbar-item">

@@ -24,7 +24,7 @@ class MainDashboard extends Component {
                             Y a través de cada cliente podremos acceder a sus ventas registradas mediante la opción "ver ventas". En esta interfaz podremos registrar
                             nuevas ventas a ese cliente, editar la información de las ventas existentes o eliminar ventas.</p>
                             <br></br>
-                            <p><b>Ver tutorial: </b>Haciendo clic en esa opción podremos volver a esta ventana.</p>
+                            <p><b>Ver guía: </b>Haciendo clic en esa opción podremos volver a esta ventana.</p>
                             <br></br>
                             <p><b>Editar cuenta: </b>A través de esta opción podremos cambiar nuestra contraseña.</p>
                             <br></br>
