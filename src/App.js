@@ -16,6 +16,7 @@ import AddCustomer from './components/add-customer/add-customer';
 import SalesRecord from './components/sales-record/sales-record';
 import EditSale from './components/edit-sale/edit-sale';
 import RegisterSale from './components/register-sale/register-sale';
+import PaymentsInAdvance from './components/payments-in-advance/payments-in-advance';
 
 function App() {
 
@@ -32,6 +33,7 @@ function App() {
         <Route path="/clientes/nuevo-cliente" component={AddCustomer} />
         <Route exact path="/clientes/cliente/:customerId" component={EditCustomer} />
         <Route exact path="/clientes/cliente/:customerId/registro-de-ventas" component={SalesRecord} />
+        <Route exact path="/clientes/cliente/:customerId/adelantos-de-pago" component={PaymentsInAdvance} />
         <Route path="/clientes/cliente/:customerId/registro-de-ventas/nueva-venta" component={RegisterSale} />
         <Route path="/clientes/cliente/:customerId/registro-de-ventas/venta/:saleId" component={EditSale} />
         <Route path="/editar-cuenta" component={EditAccount} />

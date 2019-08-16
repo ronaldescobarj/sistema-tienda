@@ -95,6 +95,31 @@ class Firebase {
         return this.db.collection("customers").doc(id).delete();
     }
 
+    //PAYMENTS
+    getPayments() {
+        return this.db.collection("payments").orderBy("date").get();
+    }
+
+    getPaymentById(id) {
+        return this.db.collection("payments").doc(id).get();
+    }
+
+    getPaymentsByParameter(parameter, value) {
+        return this.db.collection("payments").where(parameter, "==", value).get();
+    }
+
+    addPayment(payment) {
+        return this.db.collection("payments").add(payment);
+    }
+
+    updatePayment(payment, id) {
+        return this.db.collection("payments").doc(id).set(payment);
+    }
+
+    deletePayment(id) {
+        return this.db.collection("payments").doc(id).delete();
+    }
+
     //USERS
     createUser(email, password) {
         this.auth.createUserWithEmailAndPassword(email, password);
