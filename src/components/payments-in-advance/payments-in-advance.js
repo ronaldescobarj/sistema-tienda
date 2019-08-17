@@ -171,7 +171,7 @@ class PaymentsInAdvanceTableBase extends Component {
                             <p className="control">
                                 <Link
                                     className="button is-info"
-                                    to={"/clientes/cliente/" + this.props.customerId + "/registro-de-ventas/venta/" + payment._id}>
+                                    to={"/clientes/cliente/" + this.props.customerId + "/adelantos-de-pago/pago/" + payment._id}>
                                     Ver/Editar
                                 </Link>
                             </p>

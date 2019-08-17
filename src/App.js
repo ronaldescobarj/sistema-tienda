@@ -18,6 +18,7 @@ import EditSale from './components/edit-sale/edit-sale';
 import RegisterSale from './components/register-sale/register-sale';
 import PaymentsInAdvance from './components/payments-in-advance/payments-in-advance';
 import AddPayment from './components/add-payment/add-payment';
+import EditPayment from './components/edit-payment/edit-payment';
 
 function App() {
 
@@ -38,6 +39,7 @@ function App() {
         <Route path="/clientes/cliente/:customerId/registro-de-ventas/venta/:saleId" component={EditSale} />
         <Route exact path="/clientes/cliente/:customerId/adelantos-de-pago" component={PaymentsInAdvance} />
         <Route exact path="/clientes/cliente/:customerId/adelantos-de-pago/nuevo-pago" component={AddPayment} />
+        <Route path="/clientes/cliente/:customerId/adelantos-de-pago/pago/:paymentId" component={EditPayment} />
         <Route path="/editar-cuenta" component={EditAccount} />
         <Route path="/olvide-mi-contrasenia" component={ForgotPassword} />
       </div>
