@@ -135,6 +135,11 @@ class CustomersTableBase extends Component {
                                 </Link>
                             </p>
                             <p className="control">
+                                <Link className="button is-warning" to={"/clientes/cliente/" + customer._id + "/adelantos-de-pago"}>
+                                    Ver adelantos de pago
+                                </Link>
+                            </p>
+                            <p className="control">
                                 <button onClick={() => this.openModal(customer._id)} className="button is-danger">
                                     Eliminar
                                 </button>

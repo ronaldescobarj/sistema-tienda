@@ -190,8 +190,7 @@ class PaymentsInAdvanceTableBase extends Component {
 
     render() {
         const { total, modalClass, parameterToSortBy,
-            sortDirection, searchFilter, isLoading, isDeleting, noPayments, shouldUpdateInventory,
-            message } = this.state;
+            sortDirection, searchFilter, isLoading, isDeleting, noPayments } = this.state;
         if (isLoading) {
             return (
                 <div>
