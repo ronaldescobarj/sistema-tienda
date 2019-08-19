@@ -34,31 +34,27 @@ class EditCustomerFormBase extends Component {
         this.handleChange = this.handleChange.bind(this);
     }
 
-    componentDidMount() {
-        this.props.firebase.getCustomerById(this.props.customerId).then((doc) => {
-            if (doc.exists) {
-                let customer = doc.data();
-                this.setState({ name: customer.name, isLoading: false });
-            }
-            else {
-                this.setState({
-                    isLoading: false,
-                    error: "El cliente no está registrado o hubo algun error al obtenerlo"
-                });
-            }
-        });
+    async componentDidMount() {
+        let document = await this.props.firebase.getCustomerById(this.props.customerId);
+        if (document.exists) {
+            let customer = document.data();
+            this.setState({ name: customer.name, isLoading: false });
+        }
+        else {
+            this.setState({
+                isLoading: false,
+                error: "El cliente no está registrado o hubo algun error al obtenerlo"
+            });
+        }
     }
 
-    handleSubmit(event) {
+    async handleSubmit(event) {
         let customer = { name: this.state.name };
         event.preventDefault();
-        this.setState({ isSavingChanges: true }, () => {
-            this.props.firebase.updateCustomer(customer, this.props.customerId).then(() => {
-                this.setState({ ...INITIAL_STATE });
-                this.props.history.push("/clientes");
-            });
-        });
-
+        await this.setState({ isSavingChanges: true });
+        await this.props.firebase.updateCustomer(customer, this.props.customerId);
+        this.setState({ ...INITIAL_STATE });
+        this.props.history.push("/clientes");
     }
 
     handleChange(event) {

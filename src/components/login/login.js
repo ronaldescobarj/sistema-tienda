@@ -37,17 +37,17 @@ class LoginFormBase extends Component {
         const { email, password } = this.state;
         event.preventDefault();
         await this.setState({ isLoggingIn: true });
-        this.props.firebase.login(email, password).then(() => {
-            this.setState({ ...INITIAL_STATE });
-            this.props.history.push("/");
-        })
-            .catch(error => {
-                this.setState({ error: this.translateErrorMessage(error), isLoggingIn: false });
-            });
+        try {
+            await this.props.firebase.login(email, password);
+        } catch (error) {
+            this.setState({ error: this.translateErrorMessage(error), isLoggingIn: false });
+        }
+        this.setState({ ...INITIAL_STATE });
+        this.props.history.push("/");
     }
 
     translateErrorMessage(error) {
-        switch(error.code) {
+        switch (error.code) {
             case "auth/user-not-found":
                 return "No existe un usuario registrado con este correo electrónico.";
             case "auth/wrong-password":

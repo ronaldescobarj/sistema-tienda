@@ -64,11 +64,7 @@ class EditPaymentFormBase extends Component {
         };
         event.preventDefault();
         await this.setState({ isSavingChanges: true })
-        try {
-            await this.props.firebase.updatePayment(payment, this.props.paymentId);
-        } catch (err) {
-            console.log(err);
-        }
+        await this.props.firebase.updatePayment(payment, this.props.paymentId);
         this.setState({ ...INITIAL_STATE });
         this.props.history.push("/clientes/cliente/" + this.props.customerId + "/adelantos-de-pago");
     }

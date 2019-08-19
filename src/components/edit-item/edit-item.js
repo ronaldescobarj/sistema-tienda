@@ -37,28 +37,27 @@ class EditItemFormBase extends Component {
         this.handleChange = this.handleChange.bind(this);
     }
 
-    componentDidMount() {
-        this.props.firebase.getItemById(this.props.itemId).then((doc) => {
-            if (doc.exists) {
-                let item = doc.data();
-                this.setState({
-                    name: item.name,
-                    code: item.code,
-                    color: item.color,
-                    amount: item.amount,
-                    isLoading: false
-                });
-            }
-            else {
-                this.setState({
-                    isLoading: false,
-                    error: "El elemento no existe o hubo algun error al obtenerlo"
-                });
-            }
-        });
+    async componentDidMount() {
+        let document = await this.props.firebase.getItemById(this.props.itemId);
+        if (document.exists) {
+            let item = document.data();
+            this.setState({
+                name: item.name,
+                code: item.code,
+                color: item.color,
+                amount: item.amount,
+                isLoading: false
+            });
+        }
+        else {
+            this.setState({
+                isLoading: false,
+                error: "El elemento no existe o hubo algun error al obtenerlo"
+            });
+        }
     }
 
-    handleSubmit(event) {
+    async handleSubmit(event) {
         let item = {
             name: this.state.name,
             code: this.state.code,
@@ -66,12 +65,10 @@ class EditItemFormBase extends Component {
             amount: this.state.amount
         };
         event.preventDefault();
-        this.setState({ isSavingChanges: true }, () => {
-            this.props.firebase.updateItem(item, this.props.itemId).then(() => {
-                this.setState({ ...INITIAL_STATE });
-                this.props.history.push("/inventario");
-            });
-        });
+        await this.setState({ isSavingChanges: true });
+        await this.props.firebase.updateItem(item, this.props.itemId);
+        this.setState({ ...INITIAL_STATE });
+        this.props.history.push("/inventario");
     }
 
     handleChange(event) {

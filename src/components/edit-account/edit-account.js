@@ -35,17 +35,16 @@ class ChangePasswordFormBase extends Component {
         this.handleChange = this.handleChange.bind(this);
     }
 
-    handleSubmit(event) {
+    async handleSubmit(event) {
         const { passwordOne } = this.state;
         event.preventDefault();
-        this.setState({ isUpdatingPassword: true }, () => {
-            this.props.firebase.updatePassword(passwordOne).then(() => {
-                this.setState({ showMessage: true });
-            })
-                .catch(error => {
-                    this.setState({ error });
-                });
-        });
+        await this.setState({ isUpdatingPassword: true });
+        try {
+            await this.props.firebase.updatePassword(passwordOne);
+        } catch (error) {
+            this.setState({ error });
+        }
+        this.setState({ showMessage: true });
     }
 
     handleChange(event) {
@@ -66,7 +65,7 @@ class ChangePasswordFormBase extends Component {
                                 <label className="label">Nueva contraseña</label>
                                 <div className="control">
                                     <input
-                                    className="input"
+                                        className="input"
                                         name="passwordOne"
                                         value={passwordOne}
                                         onChange={this.handleChange}

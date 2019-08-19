@@ -35,7 +35,7 @@ class AddItemFormBase extends Component {
         this.handleChange = this.handleChange.bind(this);
     }
 
-    handleSubmit(event) {
+    async handleSubmit(event) {
         let item = {
             name: this.state.name,
             code: this.state.code,
@@ -43,13 +43,10 @@ class AddItemFormBase extends Component {
             amount: this.state.amount
         };
         event.preventDefault();
-        this.setState({ isSavingData: true }, () => {
-            this.props.firebase.addItem(item).then((response) => {
-                this.setState({ ...INITIAL_STATE });
-                this.props.history.push("/inventario");
-            });
-        });
-        
+        await this.setState({ isSavingData: true });
+        await this.props.firebase.addItem(item);
+        this.setState({ ...INITIAL_STATE });
+        this.props.history.push("/inventario");
     }
 
     handleChange(event) {

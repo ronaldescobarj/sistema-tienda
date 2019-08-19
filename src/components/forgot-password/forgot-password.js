@@ -33,17 +33,16 @@ class ForgotPasswordFormBase extends Component {
         this.handleChange = this.handleChange.bind(this);
     }
 
-    handleSubmit(event) {
+    async handleSubmit(event) {
         event.preventDefault();
         const { email } = this.state;
-        this.setState({ isResettingPassword: true }, () => {
-            this.props.firebase.resetPassword(email).then(() => {
-                this.setState({ showMessage: true });
-            })
-                .catch(error => {
-                    this.setState({ error });
-                });
-        });
+        await this.setState({ isResettingPassword: true });
+        try {
+            await this.props.firebase.resetPassword(email);
+        } catch(error) {
+            this.setState({ error });
+        }
+        this.setState({ showMessage: true });
     }
 
     handleChange(event) {
@@ -95,7 +94,7 @@ class ForgotPasswordFormBase extends Component {
                                         <Link to="/iniciar-sesion" className="button is-info">
                                             Volver a inicio de sesión
                                     </Link>
-                                    </div>    
+                                    </div>
                                 </div>
                             </article>
                         </div>

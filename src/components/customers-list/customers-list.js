@@ -42,34 +42,36 @@ class CustomersTableBase extends Component {
         this.modifyStateOfCustomers = this.modifyStateOfCustomers.bind(this);
     }
 
-    componentDidMount() {
-        this.getData();
+    async componentDidMount() {
+        await this.getData();
     }
 
-    getData() {
+    async getData() {
         let customers = [];
-        this.props.firebase.getCustomers().then((response) => {
-            if (!response.empty) {
-                response.forEach(doc => {
-                    let customer = doc.data();
-                    customer["_id"] = doc.id;
-                    customers.push(customer);
-                });
-                this.setState({ allCustomers: customers, filteredAndSortedCustomers: customers, isLoading: false });
-            }
-            else {
-                this.setState({ noCustomers: true, isLoading: false });
-            }
-        })
+        let response = await this.props.firebase.getCustomers();
+        if (!response.empty) {
+            response.forEach(doc => {
+                let customer = doc.data();
+                customer["_id"] = doc.id;
+                customers.push(customer);
+            });
+            this.setState({
+                allCustomers: customers,
+                filteredAndSortedCustomers: customers,
+                isLoading: false
+            });
+        }
+        else {
+            this.setState({ noCustomers: true, isLoading: false });
+        }
     }
 
-    modifyStateOfCustomers(event) {
-        this.setState({ [event.target.name]: event.target.value }, () => {
-            let { allCustomers, sortDirection, searchFilter } = this.state;
-            let filteredCustomers = this.filterCustomers(searchFilter, allCustomers);
-            let sortedCustomers = this.sortCustomers(filteredCustomers, sortDirection);
-            this.setState({ filteredAndSortedCustomers: sortedCustomers });
-        })
+    async modifyStateOfCustomers(event) {
+        await this.setState({ [event.target.name]: event.target.value });
+        let { allCustomers, sortDirection, searchFilter } = this.state;
+        let filteredCustomers = this.filterCustomers(searchFilter, allCustomers);
+        let sortedCustomers = this.sortCustomers(filteredCustomers, sortDirection);
+        this.setState({ filteredAndSortedCustomers: sortedCustomers });
     }
 
     filterCustomers(searchTerm, customersList) {
@@ -93,18 +95,16 @@ class CustomersTableBase extends Component {
         return customers;
     }
 
-    deleteCustomer() {
+    async deleteCustomer() {
         let idToDelete = this.state.idToDelete;
-        this.setState({ isDeleting: true }, () => {
-            this.props.firebase.deleteCustomer(idToDelete).then(() => {
-                let { allCustomers, sortDirection, searchFilter } = this.state;
-                allCustomers = allCustomers.filter(element => element._id !== idToDelete);
-                let filteredCustomers = this.filterCustomers(searchFilter, allCustomers);
-                let sortedCustomers = this.sortCustomers(filteredCustomers, sortDirection);
-                this.setState({ allCustomers: allCustomers, filteredAndSortedCustomers: sortedCustomers, isDeleting: false });
-                this.closeModal();
-            });
-        })
+        await this.setState({ isDeleting: true });
+        await this.props.firebase.deleteCustomer(idToDelete);
+        let { allCustomers, sortDirection, searchFilter } = this.state;
+        allCustomers = allCustomers.filter(element => element._id !== idToDelete);
+        let filteredCustomers = this.filterCustomers(searchFilter, allCustomers);
+        let sortedCustomers = this.sortCustomers(filteredCustomers, sortDirection);
+        this.setState({ allCustomers: allCustomers, filteredAndSortedCustomers: sortedCustomers, isDeleting: false });
+        this.closeModal();
     }
 
     openModal(id) {

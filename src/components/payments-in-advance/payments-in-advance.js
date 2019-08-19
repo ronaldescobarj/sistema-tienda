@@ -134,7 +134,7 @@ class PaymentsInAdvanceTableBase extends Component {
         let totalGiven = this.calculateTotal(sortedPayments, "amountGiven");
         let totalOnStock = this.calculateTotal(sortedPayments, "amountOnStock");
         let total = this.calculateTotal(sortedPayments, "totalToPay");
-        await this.setState({
+        this.setState({
             allPayments: allPayments,
             filteredAndSortedPayments: sortedPayments,
             totalGiven: totalGiven,

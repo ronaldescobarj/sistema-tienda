@@ -54,18 +54,16 @@ class RegisterSaleFormBase extends Component {
         this.recalculateTotal = this.recalculateTotal.bind(this);
     }
 
-    componentDidMount() {
-        this.getModels();
+    async componentDidMount() {
+        await this.getModels();
     }
 
-    getModels() {
-        axios.get('https://us-central1-sistema-tienda-c6c67.cloudfunctions.net/getModelsWithColors')
-            .then(response => {
-                this.setState({ models: response.data, isLoading: false });
-            })
+    async getModels() {
+        let response = await axios.get('https://us-central1-sistema-tienda-c6c67.cloudfunctions.net/getModelsWithColors');
+        this.setState({ models: response.data, isLoading: false });
     }
 
-    handleSubmit(event) {
+    async handleSubmit(event) {
         let sale = {
             customerId: this.props.customerId,
             date: this.state.date,
@@ -83,12 +81,10 @@ class RegisterSaleFormBase extends Component {
             totalToPay: this.state.totalToPay
         };
         event.preventDefault();
-        this.setState({ isSavingData: true }, () => {
-            this.props.firebase.registerSale(sale).then((response) => {
-                this.setState({ ...INITIAL_STATE });
-                this.props.history.push("/clientes/cliente/" + this.props.customerId + "/registro-de-ventas");
-            });
-        });
+        await this.setState({ isSavingData: true });
+        await this.props.firebase.registerSale(sale);
+        this.setState({ ...INITIAL_STATE });
+        this.props.history.push("/clientes/cliente/" + this.props.customerId + "/registro-de-ventas");
     }
 
     handleChange(event) {
@@ -112,16 +108,15 @@ class RegisterSaleFormBase extends Component {
         this.setState({ selectedColor: color, color: color.color });
     }
 
-    recalculateTotal(event) {
-        this.setState({ [event.target.name]: parseInt(event.target.value) }, () => {
-            let regularPriceTotal = this.state.regularPrice * this.state.amountSoldAtRegularPrice;
-            let offerPriceTotal = this.state.offerPrice * this.state.amountSoldAtOfferPrice;
-            let total = regularPriceTotal + offerPriceTotal;
-            this.setState({
-                totalToPayOnRegularPrice: regularPriceTotal,
-                totalToPayOnOfferPrice: offerPriceTotal,
-                totalToPay: total
-            });
+    async recalculateTotal(event) {
+        await this.setState({ [event.target.name]: parseInt(event.target.value) });
+        let regularPriceTotal = this.state.regularPrice * this.state.amountSoldAtRegularPrice;
+        let offerPriceTotal = this.state.offerPrice * this.state.amountSoldAtOfferPrice;
+        let total = regularPriceTotal + offerPriceTotal;
+        this.setState({
+            totalToPayOnRegularPrice: regularPriceTotal,
+            totalToPayOnOfferPrice: offerPriceTotal,
+            totalToPay: total
         });
 
     }

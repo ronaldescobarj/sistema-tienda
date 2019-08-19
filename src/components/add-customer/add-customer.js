@@ -32,15 +32,13 @@ class AddCustomerFormBase extends Component {
         this.handleChange = this.handleChange.bind(this);
     }
 
-    handleSubmit(event) {
+    async handleSubmit(event) {
         let customer = { name: this.state.name };
         event.preventDefault();
-        this.setState({ isSavingData: true }, () => {
-            this.props.firebase.addCustomer(customer).then((response) => {
-                this.setState({ ...INITIAL_STATE });
-                this.props.history.push("/clientes");
-            });
-        });
+        await this.setState({ isSavingData: true });
+        await this.props.firebase.addCustomer(customer);
+        this.setState({ ...INITIAL_STATE });
+        this.props.history.push("/clientes");
     }
 
     handleChange(event) {

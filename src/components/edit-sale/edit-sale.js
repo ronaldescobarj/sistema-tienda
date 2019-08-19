@@ -55,40 +55,35 @@ class EditSaleFormBase extends Component {
         this.recalculateTotal = this.recalculateTotal.bind(this);
     }
 
-    componentDidMount() {
-        this.getModels();
+    async componentDidMount() {
+        await this.getModels();
+        await this.getSale();
     }
 
-    getModels() {
-        axios.get('https://us-central1-sistema-tienda-c6c67.cloudfunctions.net/getModelsWithColors')
-            .then(response => {
-                this.setState({ models: response.data }, () => {
-                    this.getSale();
-                });
-            })
+    async getModels() {
+        let response = await axios.get('https://us-central1-sistema-tienda-c6c67.cloudfunctions.net/getModelsWithColors')
+        await this.setState({ models: response.data });
     }
 
-    getSale() {
-        this.props.firebase.getSaleById(this.props.saleId).then((doc) => {
-            if (doc.exists) {
-                let sale = doc.data();
-                this.setState(sale, () => {
-                    let selectedModel = this.getSelectedModel(sale, this.state.models);
-                    let selectedColor = this.getSelectedColor(sale.color, selectedModel);
-                    this.setState({
-                        selectedModel: selectedModel,
-                        selectedColor: selectedColor,
-                        isLoading: false
-                    });
-                });
-            }
-            else {
-                this.setState({
-                    isLoading: false,
-                    error: "La venta no existe, o el cliente no existe, o hubo un error en la obtención de datos"
-                });
-            }
-        });
+    async getSale() {
+        let document = await this.props.firebase.getSaleById(this.props.saleId);
+        if (document.exists) {
+            let sale = document.data();
+            await this.setState(sale);
+            let selectedModel = this.getSelectedModel(sale, this.state.models);
+            let selectedColor = this.getSelectedColor(sale.color, selectedModel);
+            this.setState({
+                selectedModel: selectedModel,
+                selectedColor: selectedColor,
+                isLoading: false
+            });
+        }
+        else {
+            this.setState({
+                isLoading: false,
+                error: "La venta no existe, o el cliente no existe, o hubo un error en la obtención de datos"
+            });
+        }
     }
 
     getSelectedModel(sale, models) {
@@ -99,7 +94,7 @@ class EditSaleFormBase extends Component {
         return selectedModel.colors.find(element => element.color === color);
     }
 
-    handleSubmit(event) {
+    async handleSubmit(event) {
         let sale = {
             customerId: this.props.customerId,
             date: this.state.date,
@@ -117,12 +112,10 @@ class EditSaleFormBase extends Component {
             totalToPay: this.state.totalToPay
         };
         event.preventDefault();
-        this.setState({ isSavingChanges: true }, () => {
-            this.props.firebase.updateSale(sale, this.props.saleId).then((response) => {
-                this.setState({ ...INITIAL_STATE });
-                this.props.history.push("/clientes/cliente/" + this.props.customerId + "/registro-de-ventas");
-            });
-        });
+        await this.setState({ isSavingChanges: true });
+        await this.props.firebase.updateSale(sale, this.props.saleId);
+        this.setState({ ...INITIAL_STATE });
+        this.props.history.push("/clientes/cliente/" + this.props.customerId + "/registro-de-ventas");
     }
 
     handleChange(event) {
@@ -144,16 +137,15 @@ class EditSaleFormBase extends Component {
         this.setState({ selectedColor: color, color: color.color });
     }
 
-    recalculateTotal(event) {
-        this.setState({ [event.target.name]: parseInt(event.target.value) }, () => {
-            let regularPriceTotal = this.state.regularPrice * this.state.amountSoldAtRegularPrice;
-            let offerPriceTotal = this.state.offerPrice * this.state.amountSoldAtOfferPrice;
-            let total = regularPriceTotal + offerPriceTotal;
-            this.setState({
-                totalToPayOnRegularPrice: regularPriceTotal,
-                totalToPayOnOfferPrice: offerPriceTotal,
-                totalToPay: total
-            });
+    async recalculateTotal(event) {
+        await this.setState({ [event.target.name]: parseInt(event.target.value) });
+        let regularPriceTotal = this.state.regularPrice * this.state.amountSoldAtRegularPrice;
+        let offerPriceTotal = this.state.offerPrice * this.state.amountSoldAtOfferPrice;
+        let total = regularPriceTotal + offerPriceTotal;
+        this.setState({
+            totalToPayOnRegularPrice: regularPriceTotal,
+            totalToPayOnOfferPrice: offerPriceTotal,
+            totalToPay: total
         });
     }
 

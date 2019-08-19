@@ -44,32 +44,31 @@ class InventoryTableBase extends Component {
         this.modifyStateOfItems = this.modifyStateOfItems.bind(this);
     }
 
-    componentDidMount() {
-        this.getData();
+    async componentDidMount() {
+        await this.getData();
     }
 
-    getData() {
+    async getData() {
         let items = [];
         let total = 0;
-        this.props.firebase.getItems().then((response) => {
-            if (!response.empty) {
-                response.forEach(doc => {
-                    let item = doc.data();
-                    item["_id"] = doc.id;
-                    items.push(item);
-                    total += parseInt(item.amount);
-                });
-                this.setState({
-                    allItems: items,
-                    filteredAndSortedItems: items,
-                    total: total,
-                    isLoading: false
-                });
-            }
-            else {
-                this.setState({ noItems: true, isLoading: false });
-            }
-        });
+        let response = await this.props.firebase.getItems();
+        if (!response.empty) {
+            response.forEach(doc => {
+                let item = doc.data();
+                item["_id"] = doc.id;
+                items.push(item);
+                total += parseInt(item.amount);
+            });
+            this.setState({
+                allItems: items,
+                filteredAndSortedItems: items,
+                total: total,
+                isLoading: false
+            });
+        }
+        else {
+            this.setState({ noItems: true, isLoading: false });
+        }
     }
 
     calculateTotal(items) {
@@ -80,14 +79,13 @@ class InventoryTableBase extends Component {
         return total;
     }
 
-    modifyStateOfItems(event) {
-        this.setState({ [event.target.name]: event.target.value }, () => {
-            let { allItems, parameterToSortBy, sortDirection, searchFilter } = this.state;
-            let filteredItems = this.filterItems(searchFilter, allItems);
-            let sortedItems = this.sortItems(filteredItems, parameterToSortBy, sortDirection);
-            let total = this.calculateTotal(sortedItems);
-            this.setState({ filteredAndSortedItems: sortedItems, total: total });
-        })
+    async modifyStateOfItems(event) {
+        await this.setState({ [event.target.name]: event.target.value });
+        let { allItems, parameterToSortBy, sortDirection, searchFilter } = this.state;
+        let filteredItems = this.filterItems(searchFilter, allItems);
+        let sortedItems = this.sortItems(filteredItems, parameterToSortBy, sortDirection);
+        let total = this.calculateTotal(sortedItems);
+        this.setState({ filteredAndSortedItems: sortedItems, total: total });
     }
 
     filterItems(searchTerm, itemsList) {
@@ -117,19 +115,17 @@ class InventoryTableBase extends Component {
         return items;
     }
 
-    deleteItem() {
+    async deleteItem() {
         let idToDelete = this.state.idToDelete;
-        this.setState({ isDeleting: true }, () => {
-            this.props.firebase.deleteItem(idToDelete).then(() => {
-                let { allItems, parameterToSortBy, sortDirection, searchFilter } = this.state;
-                allItems = allItems.filter(element => element._id !== idToDelete);
-                let filteredItems = this.filterItems(searchFilter, allItems);
-                let sortedItems = this.sortItems(filteredItems, parameterToSortBy, sortDirection);
-                let total = this.calculateTotal(sortedItems);
-                this.setState({ allItems: allItems, filteredAndSortedItems: sortedItems, total: total, isDeleting: false });
-                this.closeModal();
-            });
-        })
+        await this.setState({ isDeleting: true });
+        await this.props.firebase.deleteItem(idToDelete);
+        let { allItems, parameterToSortBy, sortDirection, searchFilter } = this.state;
+        allItems = allItems.filter(element => element._id !== idToDelete);
+        let filteredItems = this.filterItems(searchFilter, allItems);
+        let sortedItems = this.sortItems(filteredItems, parameterToSortBy, sortDirection);
+        let total = this.calculateTotal(sortedItems);
+        this.setState({ allItems: allItems, filteredAndSortedItems: sortedItems, total: total, isDeleting: false });
+        this.closeModal();
     }
 
     openModal(id) {
