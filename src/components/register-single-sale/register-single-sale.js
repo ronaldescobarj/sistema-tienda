@@ -236,7 +236,7 @@ class SalesRecordTableBase extends Component {
     render() {
         const { totalGiven, totalOnStock, total, modalClass, parameterToSortBy,
             sortDirection, searchFilter, isLoading, isDeleting, noSales, shouldUpdateInventory,
-        message } = this.state;
+            message } = this.state;
         if (isLoading) {
             return (
                 <div>
@@ -257,7 +257,10 @@ class SalesRecordTableBase extends Component {
             <div>
                 <div className="columns">
                     <div className="column has-text-centered">
-                        <Link className="button is-success" to={"/clientes/cliente/" + this.props.customerId + "/registro-de-ventas/nueva-venta"}>Registrar nueva venta</Link>
+                        <Link className="button is-success" to={"/clientes/cliente/" + this.props.customerId + "/registro-de-ventas/nueva-venta"}>Registrar venta (por mayor)</Link>
+                    </div>
+                    <div className="column has-text-centered">
+                        <Link className="button is-success" to={"/clientes/cliente/" + this.props.customerId + "/registro-de-ventas/nueva-venta"}>Registrar venta (por unidad)</Link>
                     </div>
                     <div className="column has-text-centered">
                         <div className="control">
