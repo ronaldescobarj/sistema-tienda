@@ -12,12 +12,18 @@ const INITIAL_STATE = {
     amountGiven: 0,
     amountOnStock: 0,
     amountSoldAtRegularPrice: 0,
-    regularPrice: 0,
-    totalToPayOnRegularPrice: 0,
+    regularPriceInBolivianos: 0,
+    regularPriceInSoles: 0,
+    regularPriceInBolivianosTotal: 0,
+    regularPriceInSolesTotal: 0,
     amountSoldAtOfferPrice: 0,
-    offerPrice: 0,
-    totalToPayOnOfferPrice: 0,
-    totalToPay: 0,
+    offerPriceInBolivianos: 0,
+    offerPriceInSoles: 0,
+    offerPriceInBolivianosTotal: 0,
+    offerPriceInSolesTotal: 0,
+    totalToPayInBolivianos: 0,
+    totalToPayInSoles: 0,
+
     hasOffer: false,
     models: [],
     selectedModel: null,
@@ -52,6 +58,9 @@ class RegisterSaleFormBase extends Component {
         this.changeModel = this.changeModel.bind(this);
         this.changeColor = this.changeColor.bind(this);
         this.recalculateTotal = this.recalculateTotal.bind(this);
+        this.modifyAmounts = this.modifyAmounts.bind(this);
+        this.modifyRegularPrices = this.modifyRegularPrices.bind(this);
+        this.modifyOfferPrices = this.modifyOfferPrices.bind(this);
     }
 
     async componentDidMount() {
@@ -63,23 +72,26 @@ class RegisterSaleFormBase extends Component {
         this.setState({ models: response.data, isLoading: false });
     }
 
+    createSaleObject(state) {
+        let sale = JSON.parse(JSON.stringify(state));
+        sale.customerId = this.props.customerId;
+        delete sale.hasOffer;
+        delete sale.models;
+        delete sale.selectedModel;
+        delete sale.selectedColor;
+        delete sale.isLoading;
+        delete sale.isSavingData;
+        sale.regularPriceInBolivianos = parseFloat(sale.regularPriceInBolivianos);
+        sale.regularPriceInSoles = parseFloat(sale.regularPriceInSoles);
+        sale.offerPriceInBolivianos = parseFloat(sale.offerPriceInBolivianos);
+        sale.offerPriceInSoles = parseFloat(sale.offerPriceInSoles);
+        sale.totalToPayInBolivianos = parseFloat(sale.totalToPayInBolivianos);
+        sale.totalToPayInSoles = parseFloat(sale.totalToPayInSoles);
+        return sale;
+    }
+
     async handleSubmit(event) {
-        let sale = {
-            customerId: this.props.customerId,
-            date: this.state.date,
-            model: this.state.model,
-            code: this.state.code,
-            color: this.state.color,
-            amountGiven: this.state.amountGiven,
-            amountOnStock: this.state.amountOnStock,
-            amountSoldAtRegularPrice: this.state.amountSoldAtRegularPrice,
-            regularPrice: this.state.regularPrice,
-            totalToPayOnRegularPrice: this.state.totalToPayOnRegularPrice,
-            amountSoldAtOfferPrice: this.state.amountSoldAtOfferPrice,
-            offerPrice: this.state.offerPrice,
-            totalToPayOnOfferPrice: this.state.totalToPayOnOfferPrice,
-            totalToPay: this.state.totalToPay
-        };
+        let sale = this.createSaleObject(this.state);
         event.preventDefault();
         await this.setState({ isSavingData: true });
         await this.props.firebase.registerSale(sale);
@@ -108,17 +120,65 @@ class RegisterSaleFormBase extends Component {
         this.setState({ selectedColor: color, color: color.color });
     }
 
-    async recalculateTotal(event) {
-        await this.setState({ [event.target.name]: parseInt(event.target.value) });
-        let regularPriceTotal = this.state.regularPrice * this.state.amountSoldAtRegularPrice;
-        let offerPriceTotal = this.state.offerPrice * this.state.amountSoldAtOfferPrice;
-        let total = regularPriceTotal + offerPriceTotal;
-        this.setState({
-            totalToPayOnRegularPrice: regularPriceTotal,
-            totalToPayOnOfferPrice: offerPriceTotal,
-            totalToPay: total
-        });
+    convertToSoles(price) {
+        return price * 0.49;
+    }
 
+    convertToBolivianos(price) {
+        return price * 2.05;
+    }
+
+    async modifyRegularPrices(event) {
+        let priceInBolivianos, priceInSoles;
+        if (event.target.name === "regularPriceInBolivianos") {
+            priceInBolivianos = event.target.value;
+            priceInSoles = this.convertToSoles(priceInBolivianos).toFixed(2);
+        }
+        else {
+            priceInSoles = event.target.value;
+            priceInBolivianos = this.convertToBolivianos(priceInSoles).toFixed(2);
+        }
+        await this.setState({
+            regularPriceInBolivianos: priceInBolivianos,
+            regularPriceInSoles: priceInSoles
+        });
+        this.recalculateTotal();
+    }
+
+    async modifyOfferPrices(event) {
+        let priceInBolivianos, priceInSoles;
+        if (event.target.name === "offerPriceInBolivianos") {
+            priceInBolivianos = event.target.value;
+            priceInSoles = this.convertToSoles(priceInBolivianos).toFixed(2);
+        }
+        else {
+            priceInSoles = event.target.value;
+            priceInBolivianos = this.convertToBolivianos(priceInSoles).toFixed(2);
+        }
+        await this.setState({
+            offerPriceInBolivianos: priceInBolivianos,
+            offerPriceInSoles: priceInSoles
+        });
+        this.recalculateTotal();
+    }
+
+    async modifyAmounts(event) {
+        let value = parseInt(event.target.value);
+        await this.setState({ [event.target.name]: value });
+        this.recalculateTotal();
+    }
+
+    recalculateTotal() {
+        let regularPriceInBolivianosTotal = this.state.regularPriceInBolivianos * this.state.amountSoldAtRegularPrice;
+        let regularPriceInSolesTotal = this.state.regularPriceInSoles * this.state.amountSoldAtRegularPrice;
+        let offerPriceInBolivianosTotal = this.state.offerPriceInBolivianos * this.state.amountSoldAtOfferPrice;
+        let offerPriceInSolesTotal = this.state.offerPriceInSoles * this.state.amountSoldAtOfferPrice;
+        let totalToPayInBolivianos = (regularPriceInBolivianosTotal + offerPriceInBolivianosTotal).toFixed(2);
+        let totalToPayInSoles = (regularPriceInSolesTotal + offerPriceInSolesTotal).toFixed(2);
+        this.setState({
+            regularPriceInBolivianosTotal, regularPriceInSolesTotal, offerPriceInBolivianosTotal,
+            offerPriceInSolesTotal, totalToPayInBolivianos, totalToPayInSoles
+        });
     }
 
     renderModelOptions() {
@@ -149,11 +209,14 @@ class RegisterSaleFormBase extends Component {
     }
 
     render() {
-        const { date, model, code, color, amountGiven,
-            amountOnStock, amountSoldAtRegularPrice, regularPrice, totalToPayOnRegularPrice, hasOffer,
-            amountSoldAtOfferPrice, offerPrice, totalToPayOnOfferPrice, totalToPay, isLoading,
-            isSavingData } = this.state;
+        const { date, model, code, color, amountGiven, amountOnStock, amountSoldAtRegularPrice,
+            regularPriceInBolivianos, regularPriceInSoles, regularPriceInBolivianosTotal,
+            regularPriceInSolesTotal, amountSoldAtOfferPrice, offerPriceInBolivianos, offerPriceInSoles,
+            offerPriceInBolivianosTotal, offerPriceInSolesTotal, totalToPayInBolivianos,
+            totalToPayInSoles, hasOffer, isLoading, isSavingData } = this.state;
+
         const isInvalid = model === '' || code === '' || color === '';
+
         if (isLoading) {
             return (
                 <div>
@@ -247,34 +310,80 @@ class RegisterSaleFormBase extends Component {
                                     placeholder="Vendió"
                                     name="amountSoldAtRegularPrice"
                                     value={amountSoldAtRegularPrice}
-                                    onChange={this.recalculateTotal}
+                                    onChange={this.modifyAmounts}
                                 />
                             </div>
                         </div>
                         <div className="field">
                             <label className="label">Precio regular</label>
-                            <div className="control">
-                                <input
-                                    className="input"
-                                    type="number"
-                                    placeholder="Vendió"
-                                    name="regularPrice"
-                                    value={regularPrice}
-                                    onChange={this.recalculateTotal}
-                                />
+                            <div className="field-body">
+                                <div className="field">
+                                    <p className="control is-expanded has-icons-left">
+                                        <input
+                                            className="input"
+                                            type="number"
+                                            placeholder="Total"
+                                            name="regularPriceInBolivianos"
+                                            value={regularPriceInBolivianos}
+                                            onChange={this.modifyRegularPrices}
+                                        />
+                                        <span className="icon is-small is-left">
+                                            Bs
+                                        </span>
+                                    </p>
+                                </div>
+                                <div className="field">
+                                    <p className="control is-expanded has-icons-left">
+                                        <input
+                                            className="input"
+                                            type="number"
+                                            placeholder="Total"
+                                            name="regularPriceInSoles"
+                                            value={regularPriceInSoles}
+                                            onChange={this.modifyRegularPrices}
+                                        />
+                                        <span className="icon is-small is-left">
+                                            S/
+                                        </span>
+
+                                    </p>
+                                </div>
                             </div>
                         </div>
                         <div className="field">
                             <label className="label">Total a pagar (precio regular)</label>
-                            <div className="control">
-                                <input
-                                    className="input"
-                                    type="number"
-                                    placeholder="Total"
-                                    name="totalToPayOnRegularPrice"
-                                    value={totalToPayOnRegularPrice}
-                                    onChange={this.recalculateTotal}
-                                />
+                            <div className="field-body">
+                                <div className="field">
+                                    <p className="control is-expanded has-icons-left">
+                                        <input
+                                            className="input"
+                                            type="number"
+                                            placeholder="Total"
+                                            name="regularPriceInBolivianosTotal"
+                                            value={regularPriceInBolivianosTotal}
+                                            disabled
+                                        />
+                                        <span className="icon is-small is-left">
+                                            Bs
+                                        </span>
+                                    </p>
+                                </div>
+                                <div className="field">
+                                    <p className="control is-expanded has-icons-left">
+                                        <input
+                                            className="input"
+                                            type="number"
+                                            placeholder="Total"
+                                            name="regularPriceInSolesTotal"
+                                            value={regularPriceInSolesTotal}
+                                            disabled
+                                        />
+                                        <span className="icon is-small is-left">
+                                            S/
+                                        </span>
+
+                                    </p>
+                                </div>
                             </div>
                         </div>
                         <div className="field">
@@ -299,47 +408,113 @@ class RegisterSaleFormBase extends Component {
                                     placeholder="Vendió"
                                     name="amountSoldAtOfferPrice"
                                     value={amountSoldAtOfferPrice}
-                                    onChange={this.recalculateTotal}
+                                    onChange={this.modifyAmounts}
                                 />
                             </div>
                         </div>}
                         {hasOffer && <div className="field">
-                            <label className="label">Precio con oferta</label>
-                            <div className="control">
-                                <input
-                                    className="input"
-                                    type="number"
-                                    placeholder="Precio"
-                                    name="offerPrice"
-                                    value={offerPrice}
-                                    onChange={this.recalculateTotal}
-                                />
+                            <label className="label">Precio de oferta</label>
+                            <div className="field-body">
+                                <div className="field">
+                                    <p className="control is-expanded has-icons-left">
+                                        <input
+                                            className="input"
+                                            type="number"
+                                            placeholder="Total"
+                                            name="offerPriceInBolivianos"
+                                            value={offerPriceInBolivianos}
+                                            onChange={this.modifyOfferPrices}
+                                        />
+                                        <span className="icon is-small is-left">
+                                            Bs
+                                        </span>
+                                    </p>
+                                </div>
+                                <div className="field">
+                                    <p className="control is-expanded has-icons-left">
+                                        <input
+                                            className="input"
+                                            type="number"
+                                            placeholder="Total"
+                                            name="offerPriceInSoles"
+                                            value={offerPriceInSoles}
+                                            onChange={this.modifyOfferPrices}
+                                        />
+                                        <span className="icon is-small is-left">
+                                            S/
+                                        </span>
+
+                                    </p>
+                                </div>
                             </div>
                         </div>}
-                        {hasOffer && <div className="field">
-                            <label className="label">Total a pagar (precio de oferta)</label>
-                            <div className="control">
-                                <input
-                                    className="input"
-                                    type="number"
-                                    placeholder="Total"
-                                    name="totalToPayOnOfferPrice"
-                                    value={totalToPayOnOfferPrice}
-                                    onChange={this.recalculateTotal}
-                                />
+                        {hasOffer && <div className="field-body">
+                            <div className="field">
+                                <p className="control is-expanded has-icons-left">
+                                    <input
+                                        className="input"
+                                        type="number"
+                                        placeholder="Total"
+                                        name="offerPriceInBolivianosTotal"
+                                        value={offerPriceInBolivianosTotal}
+                                        disabled
+                                    />
+                                    <span className="icon is-small is-left">
+                                        Bs
+                                        </span>
+                                </p>
+                            </div>
+                            <div className="field">
+                                <p className="control is-expanded has-icons-left">
+                                    <input
+                                        className="input"
+                                        type="number"
+                                        placeholder="Total"
+                                        name="offerPriceInSolesTotal"
+                                        value={offerPriceInSolesTotal}
+                                        disabled
+                                    />
+                                    <span className="icon is-small is-left">
+                                        S/
+                                        </span>
+
+                                </p>
                             </div>
                         </div>}
                         <div className="field">
                             <label className="label">Total a pagar global</label>
-                            <div className="control">
-                                <input
-                                    className="input"
-                                    type="number"
-                                    placeholder="Total"
-                                    name="totalToPayOnRegularPrice"
-                                    value={totalToPay}
-                                    onChange={this.recalculateTotal}
-                                />
+                            <div className="field-body">
+                                <div className="field">
+                                    <p className="control is-expanded has-icons-left">
+                                        <input
+                                            className="input"
+                                            type="number"
+                                            placeholder="Total"
+                                            name="totalToPayInBolivianos"
+                                            value={totalToPayInBolivianos}
+                                            disabled
+                                        />
+                                        <span className="icon is-small is-left">
+                                            Bs
+                                        </span>
+                                    </p>
+                                </div>
+                                <div className="field">
+                                    <p className="control is-expanded has-icons-left">
+                                        <input
+                                            className="input"
+                                            type="number"
+                                            placeholder="Total"
+                                            name="totalToPayInSoles"
+                                            value={totalToPayInSoles}
+                                            disabled
+                                        />
+                                        <span className="icon is-small is-left">
+                                            S/
+                                        </span>
+
+                                    </p>
+                                </div>
                             </div>
                         </div>
                         <div className="field is-grouped">
