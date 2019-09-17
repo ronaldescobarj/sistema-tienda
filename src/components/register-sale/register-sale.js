@@ -14,13 +14,13 @@ const INITIAL_STATE = {
     amountSoldAtRegularPrice: 0,
     regularPriceInBolivianos: 0,
     regularPriceInSoles: 0,
-    regularPriceInBolivianosTotal: 0,
-    regularPriceInSolesTotal: 0,
+    totalToPayOnRegularPriceInBolivianos: 0,
+    totalToPayOnRegularPriceInSoles: 0,
     amountSoldAtOfferPrice: 0,
     offerPriceInBolivianos: 0,
     offerPriceInSoles: 0,
-    offerPriceInBolivianosTotal: 0,
-    offerPriceInSolesTotal: 0,
+    totalToPayOnOfferPriceInBolivianos: 0,
+    totalToPayOnOfferPriceInSoles: 0,
     totalToPayInBolivianos: 0,
     totalToPayInSoles: 0,
 
@@ -169,15 +169,15 @@ class RegisterSaleFormBase extends Component {
     }
 
     recalculateTotal() {
-        let regularPriceInBolivianosTotal = this.state.regularPriceInBolivianos * this.state.amountSoldAtRegularPrice;
-        let regularPriceInSolesTotal = this.state.regularPriceInSoles * this.state.amountSoldAtRegularPrice;
-        let offerPriceInBolivianosTotal = this.state.offerPriceInBolivianos * this.state.amountSoldAtOfferPrice;
-        let offerPriceInSolesTotal = this.state.offerPriceInSoles * this.state.amountSoldAtOfferPrice;
-        let totalToPayInBolivianos = (regularPriceInBolivianosTotal + offerPriceInBolivianosTotal).toFixed(2);
-        let totalToPayInSoles = (regularPriceInSolesTotal + offerPriceInSolesTotal).toFixed(2);
+        let totalToPayOnRegularPriceInBolivianos = this.state.regularPriceInBolivianos * this.state.amountSoldAtRegularPrice;
+        let totalToPayOnRegularPriceInSoles = this.state.regularPriceInSoles * this.state.amountSoldAtRegularPrice;
+        let totalToPayOnOfferPriceInBolivianos = this.state.offerPriceInBolivianos * this.state.amountSoldAtOfferPrice;
+        let totalToPayOnOfferPriceInSoles = this.state.offerPriceInSoles * this.state.amountSoldAtOfferPrice;
+        let totalToPayInBolivianos = (totalToPayOnRegularPriceInBolivianos + totalToPayOnOfferPriceInBolivianos).toFixed(2);
+        let totalToPayInSoles = (totalToPayOnRegularPriceInSoles + totalToPayOnOfferPriceInSoles).toFixed(2);
         this.setState({
-            regularPriceInBolivianosTotal, regularPriceInSolesTotal, offerPriceInBolivianosTotal,
-            offerPriceInSolesTotal, totalToPayInBolivianos, totalToPayInSoles
+            totalToPayOnRegularPriceInBolivianos, totalToPayOnRegularPriceInSoles, totalToPayOnOfferPriceInBolivianos,
+            totalToPayOnOfferPriceInSoles, totalToPayInBolivianos, totalToPayInSoles
         });
     }
 
@@ -210,9 +210,9 @@ class RegisterSaleFormBase extends Component {
 
     render() {
         const { date, model, code, color, amountGiven, amountOnStock, amountSoldAtRegularPrice,
-            regularPriceInBolivianos, regularPriceInSoles, regularPriceInBolivianosTotal,
-            regularPriceInSolesTotal, amountSoldAtOfferPrice, offerPriceInBolivianos, offerPriceInSoles,
-            offerPriceInBolivianosTotal, offerPriceInSolesTotal, totalToPayInBolivianos,
+            regularPriceInBolivianos, regularPriceInSoles, totalToPayOnRegularPriceInBolivianos,
+            totalToPayOnRegularPriceInSoles, amountSoldAtOfferPrice, offerPriceInBolivianos, offerPriceInSoles,
+            totalToPayOnOfferPriceInBolivianos, totalToPayOnOfferPriceInSoles, totalToPayInBolivianos,
             totalToPayInSoles, hasOffer, isLoading, isSavingData } = this.state;
 
         const isInvalid = model === '' || code === '' || color === '';
@@ -359,8 +359,8 @@ class RegisterSaleFormBase extends Component {
                                             className="input"
                                             type="number"
                                             placeholder="Total"
-                                            name="regularPriceInBolivianosTotal"
-                                            value={regularPriceInBolivianosTotal}
+                                            name="totalToPayOnRegularPriceInBolivianos"
+                                            value={totalToPayOnRegularPriceInBolivianos}
                                             disabled
                                         />
                                         <span className="icon is-small is-left">
@@ -374,8 +374,8 @@ class RegisterSaleFormBase extends Component {
                                             className="input"
                                             type="number"
                                             placeholder="Total"
-                                            name="regularPriceInSolesTotal"
-                                            value={regularPriceInSolesTotal}
+                                            name="totalToPayOnRegularPriceInSoles"
+                                            value={totalToPayOnRegularPriceInSoles}
                                             disabled
                                         />
                                         <span className="icon is-small is-left">
@@ -455,8 +455,8 @@ class RegisterSaleFormBase extends Component {
                                         className="input"
                                         type="number"
                                         placeholder="Total"
-                                        name="offerPriceInBolivianosTotal"
-                                        value={offerPriceInBolivianosTotal}
+                                        name="totalToPayOnOfferPriceInBolivianos"
+                                        value={totalToPayOnOfferPriceInBolivianos}
                                         disabled
                                     />
                                     <span className="icon is-small is-left">
@@ -470,8 +470,8 @@ class RegisterSaleFormBase extends Component {
                                         className="input"
                                         type="number"
                                         placeholder="Total"
-                                        name="offerPriceInSolesTotal"
-                                        value={offerPriceInSolesTotal}
+                                        name="totalToPayOnOfferPriceInSoles"
+                                        value={totalToPayOnOfferPriceInSoles}
                                         disabled
                                     />
                                     <span className="icon is-small is-left">

@@ -185,9 +185,6 @@ class SalesRecordTableBase extends Component {
                         {sale.date}
                     </td>
                     <td>
-                        {sale.model}
-                    </td>
-                    <td>
                         {sale.code}
                     </td>
                     <td>
@@ -197,19 +194,19 @@ class SalesRecordTableBase extends Component {
                         {sale.amountGiven}
                     </td>
                     <td>
-                        {sale.amountOnStock}
-                    </td>
-                    <td>
                         {sale.amountSoldAtRegularPrice}
                     </td>
                     <td>
-                        {sale.regularPrice}
+                        {sale.regularPriceInBolivianos}/{sale.regularPriceInSoles}
                     </td>
                     <td>
-                        {sale.totalToPayOnRegularPrice}
+                        {sale.amountSoldAtOfferPrice}
                     </td>
                     <td>
-                        {sale.totalToPay}
+                        {sale.offerPriceInBolivianos}/{sale.offerPriceInSoles}
+                    </td>
+                    <td>
+                        {sale.totalToPayInBolivianos}/{sale.totalToPayInSoles}
                     </td>
                     <td>
                         <div className="field has-addons">
@@ -314,15 +311,14 @@ class SalesRecordTableBase extends Component {
                             <thead>
                                 <tr className="is-selected is-link">
                                     <th>Fecha</th>
-                                    <th>Modelo</th>
                                     <th>Código</th>
                                     <th>Color</th>
                                     <th>Se le dio</th>
-                                    <th>Tiene en stock</th>
-                                    <th>Total vendido</th>
-                                    <th>Precio</th>
-                                    <th>Total (precio)</th>
-                                    <th>Total</th>
+                                    <th>Total vendido (normal)</th>
+                                    <th>Precio normal Bs/S/</th>
+                                    <th>Total vendido (oferta)</th>
+                                    <th>Precio oferta Bs/S/</th>
+                                    <th>Total Bs/S/</th>
                                     <th>Acciones</th>
                                 </tr>
                             </thead>
