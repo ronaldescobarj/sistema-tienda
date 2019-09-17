@@ -211,9 +211,9 @@ class RegisterSaleFormBase extends Component {
     render() {
         const { date, model, code, color, amountGiven, amountOnStock, amountSoldAtRegularPrice,
             regularPriceInBolivianos, regularPriceInSoles, totalToPayOnRegularPriceInBolivianos,
-            totalToPayOnRegularPriceInSoles, amountSoldAtOfferPrice, offerPriceInBolivianos, offerPriceInSoles,
-            totalToPayOnOfferPriceInBolivianos, totalToPayOnOfferPriceInSoles, totalToPayInBolivianos,
-            totalToPayInSoles, hasOffer, isLoading, isSavingData } = this.state;
+            totalToPayOnRegularPriceInSoles, amountSoldAtOfferPrice, offerPriceInBolivianos,
+            offerPriceInSoles, totalToPayOnOfferPriceInBolivianos, totalToPayOnOfferPriceInSoles,
+            totalToPayInBolivianos, totalToPayInSoles, hasOffer, isLoading, isSavingData } = this.state;
 
         const isInvalid = model === '' || code === '' || color === '';
 
