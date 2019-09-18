@@ -8,9 +8,9 @@ import axios from 'axios';
 const INITIAL_STATE = {
     allSales: [],
     filteredAndSortedSales: [],
-    totalGiven: 0,
-    totalOnStock: 0,
-    total: 0,
+    totalSold: 0,
+    totalInBolivianos: 0,
+    totalInSoles: 0,
     modalClass: "modal",
     idToDelete: '',
     parameterToSortBy: 'date',
@@ -57,23 +57,23 @@ class SingleSalesRecordTableBase extends Component {
 
     async getData() {
         let sales = [];
-        let totalGiven = 0, totalOnStock = 0, total = 0;
-        let response = await this.props.firebase.getSalesByParameter("customerId", this.props.customerId);
+        let totalSold = 0, totalInBolivianos = 0, totalInSoles = 0;
+        let response = await this.props.firebase.getSingleSales();
         if (!response.empty) {
             response.forEach(doc => {
                 let sale = doc.data();
                 sale["_id"] = doc.id;
                 sales.push(sale);
-                totalGiven += parseInt(sale.amountGiven);
-                totalOnStock += parseInt(sale.amountOnStock);
-                total += parseInt(sale.totalToPay);
+                totalSold += parseInt(sale.amountSold);
+                totalInBolivianos += parseInt(sale.totalToPayInBolivianos);
+                totalInSoles += parseInt(sale.totalToPayInSoles);
             });
             this.setState({
                 allSales: sales,
                 filteredAndSortedSales: sales,
-                totalGiven: totalGiven,
-                totalOnStock: totalOnStock,
-                total: total,
+                totalSold,
+                totalInBolivianos,
+                totalInSoles,
                 isLoading: false
             });
         }
@@ -102,16 +102,11 @@ class SingleSalesRecordTableBase extends Component {
         await this.setState({ [event.target.name]: event.target.value });
         let { allSales, parameterToSortBy, sortDirection, searchFilter } = this.state;
         let filteredSales = this.filterSales(searchFilter, allSales);
-        let sortedSales = this.sortSales(filteredSales, parameterToSortBy, sortDirection);
-        let totalGiven = this.calculateTotal(sortedSales, "amountGiven");
-        let totalOnStock = this.calculateTotal(sortedSales, "amountOnStock");
-        let total = this.calculateTotal(sortedSales, "totalToPay");
-        this.setState({
-            filteredAndSortedSales: sortedSales,
-            totalGiven: totalGiven,
-            totalOnStock: totalOnStock,
-            total: total
-        });
+        let filteredAndSortedSales = this.sortSales(filteredSales, parameterToSortBy, sortDirection);
+        let totalSold = this.calculateTotal(filteredAndSortedSales, "amountSold");
+        let totalInBolivianos = this.calculateTotal(filteredAndSortedSales, "totalToPayInBolivianos");
+        let totalInSoles = this.calculateTotal(filteredAndSortedSales, "totalToPayInSoles");
+        this.setState({ filteredAndSortedSales, totalSold, totalInBolivianos, totalInSoles });
     }
 
     filterSales(searchTerm, salesList) {
@@ -192,19 +187,13 @@ class SingleSalesRecordTableBase extends Component {
                         {sale.color}
                     </td>
                     <td>
-                        {sale.amountGiven}
+                        {sale.customerName}
                     </td>
                     <td>
-                        {sale.amountSoldAtRegularPrice}
+                        {sale.amountSold}
                     </td>
                     <td>
-                        {sale.regularPriceInBolivianos}/{sale.regularPriceInSoles}
-                    </td>
-                    <td>
-                        {sale.amountSoldAtOfferPrice}
-                    </td>
-                    <td>
-                        {sale.offerPriceInBolivianos}/{sale.offerPriceInSoles}
+                        {sale.priceInBolivianos}/{sale.priceInSoles}
                     </td>
                     <td>
                         {sale.totalToPayInBolivianos}/{sale.totalToPayInSoles}
@@ -232,7 +221,7 @@ class SingleSalesRecordTableBase extends Component {
     }
 
     render() {
-        const { totalGiven, totalOnStock, total, modalClass, parameterToSortBy,
+        const { totalSold, totalInBolivianos, totalInSoles, modalClass, parameterToSortBy,
             sortDirection, searchFilter, isLoading, isDeleting, noSales, shouldUpdateInventory,
             message } = this.state;
         if (isLoading) {
@@ -277,7 +266,7 @@ class SingleSalesRecordTableBase extends Component {
                                                 <option value="date">Fecha</option>
                                                 <option value="model">Modelo</option>
                                                 <option value="color">Color</option>
-                                                <option value="amountGiven">Se le dió</option>
+                                                <option value="amountGiven">Cantidad vendida</option>
                                             </select>
                                         </div>
                                     </div>
@@ -314,11 +303,9 @@ class SingleSalesRecordTableBase extends Component {
                                     <th>Fecha</th>
                                     <th>Código</th>
                                     <th>Color</th>
-                                    <th>Se le dio</th>
-                                    <th>Total vendido (normal)</th>
-                                    <th>Precio normal Bs/S/</th>
-                                    <th>Total vendido (oferta)</th>
-                                    <th>Precio oferta Bs/S/</th>
+                                    <th>Cliente</th>
+                                    <th>Cantidad vendida</th>
+                                    <th>Precio Bs/S/</th>
                                     <th>Total Bs/S/</th>
                                     <th>Acciones</th>
                                 </tr>
@@ -329,12 +316,9 @@ class SingleSalesRecordTableBase extends Component {
                                     <th></th>
                                     <th></th>
                                     <th>Total</th>
-                                    <th>{totalGiven}</th>
-                                    <th>{totalOnStock}</th>
-                                    <th></th>
-                                    <th></th>
-                                    <th></th>
-                                    <th>{total}</th>
+                                    <th>{totalSold}</th>
+                                    <th>Total a pagar</th>
+                                    <th>{totalInBolivianos}/{totalInSoles}</th>
                                     <th></th>
                                 </tr>
                             </tfoot>
