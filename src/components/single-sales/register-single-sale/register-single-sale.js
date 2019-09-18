@@ -82,7 +82,7 @@ class RegisterSingleSaleFormBase extends Component {
         await this.setState({ isSavingData: true });
         await this.props.firebase.registerSingleSale(sale);
         this.setState({ ...INITIAL_STATE });
-        this.props.history.push("/registro-de-ventas-individuales");
+        this.props.history.push("/ventas-individuales");
     }
 
     handleChange(event) {

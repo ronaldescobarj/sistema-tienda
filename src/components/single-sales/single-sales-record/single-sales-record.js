@@ -35,7 +35,7 @@ const SingleSalesRecord = ({ match }) => (
             </div>
         </section>
         <br></br>
-        <SingleSalesRecordTable customerId={match.params.customerId} />
+        <SingleSalesRecordTable />
     </div>
 );
 
@@ -203,7 +203,7 @@ class SingleSalesRecordTableBase extends Component {
                             <p className="control">
                                 <Link
                                     className="button is-info"
-                                    to={"/clientes/cliente/" + this.props.customerId + "/registro-de-ventas/venta/" + sale._id}>
+                                    to={"/ventas-individuales/venta-individual/" + sale._id}>
                                     Ver/Editar
                                 </Link>
                             </p>
@@ -236,7 +236,7 @@ class SingleSalesRecordTableBase extends Component {
                 <div className="column has-text-centered">
                     <p>El cliente actual no tiene ventas registradas.</p>
                     <br></br>
-                    <Link className="button is-success" to={"/clientes/cliente/" + this.props.customerId + "/registro-de-ventas/nueva-venta"}>Registrar nueva venta</Link>
+                    <Link className="button is-success" to={"/ventas-individuales/nueva-venta-individual"}>Registrar nueva venta</Link>
                 </div>
             );
         }
@@ -244,7 +244,7 @@ class SingleSalesRecordTableBase extends Component {
             <div>
                 <div className="columns">
                     <div className="column has-text-centered">
-                        <Link className="button is-success" to={"/clientes/cliente/" + this.props.customerId + "/registro-de-ventas/nueva-venta"}>Registrar nueva venta</Link>
+                        <Link className="button is-success" to={"ventas-individuales/nueva-venta-individual"}>Registrar nueva venta</Link>
                     </div>
                     <div className="column has-text-centered">
                         <div className="control">
