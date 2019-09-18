@@ -48,6 +48,20 @@ exports.discountFromInventory = functions.firestore
     });
 
 
+exports.discountFromInventoryOnSingleSale = functions.firestore
+    .document('singleSales/{saleId}')
+    .onCreate(async (snap, context) => {
+        const sale = snap.data();
+        let response = await db.collection("inventory").where("name", "==", sale.model).where("code", "==", sale.code).where("color", "==", sale.color).get();
+        let itemId, item;
+        response.forEach((element) => {
+            itemId = element.id;
+            item = element.data();
+        })
+        item.amount = item.amount - sale.amountSold;
+        return await db.collection("inventory").doc(itemId).set(item);
+    });
+
 exports.updateAmountOnInventory = functions.firestore
     .document("sales/{saleId}")
     .onUpdate(async (change, context) => {
@@ -81,7 +95,41 @@ exports.updateAmountOnInventory = functions.firestore
             item.amount = item.amount - amountToModify;
             return await db.collection("inventory").doc(itemId).set(item);
         }
+    })
 
+exports.updateAmountOnInventoryForSingleSale = functions.firestore
+    .document("singleSales/{saleId}")
+    .onUpdate(async (change, context) => {
+        const updatedSale = change.after.data();
+        const previousSale = change.before.data();
+        if (updatedSale.code !== previousSale.code || updatedSale.model !== previousSale.model || updatedSale.color !== previousSale.color) {
+            let response = await db.collection("inventory").where("name", "==", previousSale.model).where("code", "==", previousSale.code).where("color", "==", previousSale.color).get();
+            let itemId, item;
+            response.forEach((element) => {
+                itemId = element.id;
+                item = element.data();
+            });
+            item.amount = item.amount + previousSale.amountSold;
+            await db.collection("inventory").doc(itemId).set(item);
+            let newResponse = await db.collection("inventory").where("name", "==", updatedSale.model).where("code", "==", updatedSale.code).where("color", "==", updatedSale.color).get();
+            newResponse.forEach((element) => {
+                itemId = element.id;
+                item = element.data();
+            });
+            item.amount = item.amount - updatedSale.amountSold;
+            return await db.collection("inventory").doc(itemId).set(item);
+        }
+        else {
+            let amountToModify = updatedSale.amountSold - previousSale.amountSold;
+            let response = await db.collection("inventory").where("name", "==", updatedSale.model).where("code", "==", updatedSale.code).where("color", "==", updatedSale.color).get();
+            let itemId, item;
+            response.forEach((element) => {
+                itemId = element.id;
+                item = element.data();
+            })
+            item.amount = item.amount - amountToModify;
+            return await db.collection("inventory").doc(itemId).set(item);
+        }
     })
 
 exports.deleteSale = functions.https.onRequest((req, res) => {
