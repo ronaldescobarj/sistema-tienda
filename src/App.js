@@ -19,6 +19,9 @@ import RegisterSale from './components/register-sale/register-sale';
 import PaymentsInAdvance from './components/payments-in-advance/payments-in-advance';
 import AddPayment from './components/add-payment/add-payment';
 import EditPayment from './components/edit-payment/edit-payment';
+import RegisterSingleSale from './components/register-single-sale/register-single-sale';
+import SingleSalesRecord from './components/single-sales-record/single-sales-record';
+import EditSingleSale from './components/edit-single-sale/edit-single-sale';
 
 import { library } from '@fortawesome/fontawesome-svg-core'
 import { fab } from '@fortawesome/free-brands-svg-icons'
@@ -37,6 +40,9 @@ function App() {
         <Route exact path="/inventario" component={Inventory} />
         <Route path="/inventario/nuevo-item" component={AddItem} />
         <Route path="/inventario/item/:itemId" component={EditItem} />
+        <Route exact path="/ventas-individuales" component={SingleSalesRecord} />
+        <Route path="/ventas-individuales/nueva-venta-individual" component={RegisterSingleSale} />
+        <Route path="/ventas-individuales/venta-individual/:singleSaleId" component={EditSingleSale} />
         <Route exact path="/clientes" component={CustomersList} />
         <Route path="/clientes/nuevo-cliente" component={AddCustomer} />
         <Route exact path="/clientes/cliente/:customerId" component={EditCustomer} />

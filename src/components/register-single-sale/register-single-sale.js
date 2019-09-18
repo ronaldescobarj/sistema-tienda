@@ -1,242 +1,178 @@
 import React, { Component } from 'react';
 import { withFirebase } from '../firebase';
-import { Link } from "react-router-dom";
+import { Link, withRouter } from "react-router-dom";
 import { withAuthorization } from '../session';
 import axios from 'axios';
 
 const INITIAL_STATE = {
-    allSales: [],
-    filteredAndSortedSales: [],
-    totalGiven: 0,
-    totalOnStock: 0,
-    total: 0,
-    modalClass: "modal",
-    idToDelete: '',
-    parameterToSortBy: 'date',
-    sortDirection: 'ascendant',
-    searchFilter: '',
+    date: '',
+    model: '',
+    code: '',
+    color: '',
+    customerName: '',
+    amountSold: 0,
+    priceInBolivianos: 0,
+    priceInSoles: 0,
+    totalToPayInBolivianos: 0,
+    totalToPayInSoles: 0,
+
+    models: [],
+    selectedModel: null,
+    selectedColor: null,
     isLoading: true,
-    isDeleting: false,
-    noSales: false,
-    message: '',
-    shouldUpdateInventory: false
+    isSavingData: false
 }
 
-const SalesRecord = ({ match }) => (
+const RegisterSingleSale = () => (
     <div>
         <section className="hero is-small is-primary">
             <div className="hero-body">
                 <div className="container has-text-centered">
                     <h1 className="title">
-                        Registro de ventas
+                        Registrar venta individual
                     </h1>
                 </div>
             </div>
         </section>
         <br></br>
-        <SalesRecordTable customerId={match.params.customerId} />
+        <RegisterSingleSaleForm />
     </div>
 );
 
-class SalesRecordTableBase extends Component {
-
+class RegisterSingleSaleFormBase extends Component {
     constructor(props) {
         super(props);
         this.state = { ...INITIAL_STATE };
-        this.openModal = this.openModal.bind(this);
-        this.closeModal = this.closeModal.bind(this);
-        this.deleteSale = this.deleteSale.bind(this);
-        this.modifyStateOfSales = this.modifyStateOfSales.bind(this);
-        this.toggleInventoryUpdateWhenDeleting = this.toggleInventoryUpdateWhenDeleting.bind(this);
+        this.handleSubmit = this.handleSubmit.bind(this);
+        this.handleChange = this.handleChange.bind(this);
+        this.getModels = this.getModels.bind(this);
+        this.changeModel = this.changeModel.bind(this);
+        this.changeColor = this.changeColor.bind(this);
+        this.recalculateTotal = this.recalculateTotal.bind(this);
+        this.modifyAmounts = this.modifyAmounts.bind(this);
+        this.modifyPrices = this.modifyPrices.bind(this);
     }
 
     async componentDidMount() {
-        await this.getData();
+        await this.getModels();
     }
 
-    async getData() {
-        let sales = [];
-        let totalGiven = 0, totalOnStock = 0, total = 0;
-        let response = await this.props.firebase.getSalesByParameter("customerId", this.props.customerId);
-        if (!response.empty) {
-            response.forEach(doc => {
-                let sale = doc.data();
-                sale["_id"] = doc.id;
-                sales.push(sale);
-                totalGiven += parseInt(sale.amountGiven);
-                totalOnStock += parseInt(sale.amountOnStock);
-                total += parseInt(sale.totalToPay);
-            });
-            this.setState({
-                allSales: sales,
-                filteredAndSortedSales: sales,
-                totalGiven: totalGiven,
-                totalOnStock: totalOnStock,
-                total: total,
-                isLoading: false
-            });
+    async getModels() {
+        let response = await axios.get('https://us-central1-sistema-tienda-c6c67.cloudfunctions.net/getModelsWithColors');
+        this.setState({ models: response.data, isLoading: false });
+    }
+
+    createSaleObject(state) {
+        let sale = JSON.parse(JSON.stringify(state));
+        delete sale.models;
+        delete sale.selectedModel;
+        delete sale.selectedColor;
+        delete sale.isLoading;
+        delete sale.isSavingData;
+        sale.priceInBolivianos = parseFloat(sale.priceInBolivianos);
+        sale.priceInSoles = parseFloat(sale.priceInSoles);
+        sale.totalToPayInBolivianos = parseFloat(sale.totalToPayInBolivianos);
+        sale.totalToPayInSoles = parseFloat(sale.totalToPayInSoles);
+        return sale;
+    }
+
+    async handleSubmit(event) {
+        let sale = this.createSaleObject(this.state);
+        event.preventDefault();
+        await this.setState({ isSavingData: true });
+        await this.props.firebase.registerSingleSale(sale);
+        this.setState({ ...INITIAL_STATE });
+        this.props.history.push("/registro-de-ventas-individuales");
+    }
+
+    handleChange(event) {
+        let value;
+        if (event.target.type === "number")
+            value = parseInt(event.target.value);
+        else if (event.target.type === "checkbox")
+            value = event.target.checked;
+        else
+            value = event.target.value;
+        this.setState({ [event.target.name]: value });
+    }
+
+    changeModel(event) {
+        let model = this.state.models.find(element => element[event.target.name] === event.target.value);
+        this.setState({ selectedModel: model, model: model.model, code: model.code, selectedColor: null, color: '' });
+    }
+
+    changeColor(event) {
+        let color = this.state.selectedModel.colors.find(col => col.color === event.target.value);
+        this.setState({ selectedColor: color, color: color.color });
+    }
+
+    convertToSoles(price) {
+        return price * 0.49;
+    }
+
+    convertToBolivianos(price) {
+        return price * 2.05;
+    }
+
+    async modifyPrices(event) {
+        let priceInBolivianos, priceInSoles;
+        if (event.target.name === "priceInBolivianos") {
+            priceInBolivianos = event.target.value;
+            priceInSoles = this.convertToSoles(priceInBolivianos).toFixed(2);
         }
         else {
-            this.setState({ isLoading: false, noSales: true });
+            priceInSoles = event.target.value;
+            priceInBolivianos = this.convertToBolivianos(priceInSoles).toFixed(2);
         }
+        await this.setState({ priceInBolivianos, priceInSoles });
+        this.recalculateTotal();
     }
 
-    getSale(sales, id) {
-        return sales.find(sale => sale._id === id);
+    async modifyAmounts(event) {
+        let value = parseInt(event.target.value);
+        await this.setState({ [event.target.name]: value });
+        this.recalculateTotal();
     }
 
-    calculateTotal(sales, parameter) {
-        let total = 0;
-        sales.forEach(sale => {
-            total += parseInt(sale[parameter]);
-        })
-        return total;
+    recalculateTotal() {
+        let totalToPayInBolivianos = this.state.priceInBolivianos * this.state.amountSold;
+        let totalToPayInSoles = this.state.priceInSoles * this.state.amountSold;
+        this.setState({ totalToPayInBolivianos, totalToPayInSoles });
     }
 
-    toggleInventoryUpdateWhenDeleting(event) {
-        this.setState({ shouldUpdateInventory: event.target.checked });
-    }
-
-    async modifyStateOfSales(event) {
-        await this.setState({ [event.target.name]: event.target.value });
-        let { allSales, parameterToSortBy, sortDirection, searchFilter } = this.state;
-        let filteredSales = this.filterSales(searchFilter, allSales);
-        let sortedSales = this.sortSales(filteredSales, parameterToSortBy, sortDirection);
-        let totalGiven = this.calculateTotal(sortedSales, "amountGiven");
-        let totalOnStock = this.calculateTotal(sortedSales, "amountOnStock");
-        let total = this.calculateTotal(sortedSales, "totalToPay");
-        this.setState({
-            filteredAndSortedSales: sortedSales,
-            totalGiven: totalGiven,
-            totalOnStock: totalOnStock,
-            total: total
-        });
-    }
-
-    filterSales(searchTerm, salesList) {
-        let filteredSales = [];
-        for (let sale of salesList) {
-            for (let property in sale) {
-                if (property !== "_id") {
-                    if (sale[property].toString().includes(searchTerm)) {
-                        filteredSales.push(sale);
-                        break;
-                    }
-                }
-            }
-        }
-        return filteredSales;
-    }
-
-    sortSales(sales, parameter, sortDirection) {
-        let isAscendant = sortDirection === 'ascendant';
-        sales.sort((first, second) => {
-            if (first[parameter] < second[parameter])
-                return isAscendant ? -1 : 1;
-            if (first[parameter] > second[parameter])
-                return isAscendant ? 1 : -1;
-            return 0;
-        });
-        return sales;
-    }
-
-    async deleteSale() {
-        let idToDelete = this.state.idToDelete;
-        await this.setState({ isDeleting: true });
-        let response = await axios.delete('https://us-central1-sistema-tienda-c6c67.cloudfunctions.net/deleteSale',
-            {
-                data: {
-                    shouldUpdateInventory: this.state.shouldUpdateInventory,
-                    sale: this.getSale(this.state.allSales, idToDelete)
-                }
-            });
-        let { allSales, parameterToSortBy, sortDirection, searchFilter } = this.state;
-        allSales = allSales.filter(element => element._id !== idToDelete);
-        let filteredSales = this.filterSales(searchFilter, allSales);
-        let sortedSales = this.sortSales(filteredSales, parameterToSortBy, sortDirection);
-        let totalGiven = this.calculateTotal(sortedSales, "amountGiven");
-        let totalOnStock = this.calculateTotal(sortedSales, "amountOnStock");
-        let total = this.calculateTotal(sortedSales, "totalToPay");
-        await this.setState({
-            allSales: allSales,
-            filteredAndSortedSales: sortedSales,
-            totalGiven: totalGiven,
-            totalOnStock: totalOnStock,
-            total: total,
-            isDeleting: false,
-            message: response.data.error ? response.data.error : ''
-        });
-        this.closeModal();
-    }
-
-    openModal(id) {
-        this.setState({ modalClass: "modal is-active", idToDelete: id })
-    }
-
-    closeModal() {
-        this.setState({ modalClass: "modal", idToDelete: '' })
-    }
-
-    renderSales() {
-        let tableSales = this.state.filteredAndSortedSales.map((sale, index) => {
+    renderModelOptions() {
+        let modelOptions = this.state.models.map((item, index) => {
             return (
-                <tr key={sale._id}>
-                    <td>
-                        {sale.date}
-                    </td>
-                    <td>
-                        {sale.model}
-                    </td>
-                    <td>
-                        {sale.code}
-                    </td>
-                    <td>
-                        {sale.color}
-                    </td>
-                    <td>
-                        {sale.amountGiven}
-                    </td>
-                    <td>
-                        {sale.amountOnStock}
-                    </td>
-                    <td>
-                        {sale.amountSoldAtRegularPrice}
-                    </td>
-                    <td>
-                        {sale.regularPrice}
-                    </td>
-                    <td>
-                        {sale.totalToPayOnRegularPrice}
-                    </td>
-                    <td>
-                        {sale.totalToPay}
-                    </td>
-                    <td>
-                        <div className="field has-addons">
-                            <p className="control">
-                                <Link
-                                    className="button is-info"
-                                    to={"/clientes/cliente/" + this.props.customerId + "/registro-de-ventas/venta/" + sale._id}>
-                                    Ver/Editar
-                                </Link>
-                            </p>
-                            <p className="control">
-                                <button onClick={() => this.openModal(sale._id)} className="button is-danger">
-                                    Eliminar
-                                </button>
-                            </p>
-                        </div>
-                    </td>
-                </tr>
+                <option key={index} value={item.model}>{item.model}</option>
             )
         });
-        return tableSales;
+        return modelOptions;
+    }
+
+    renderCodeOptions() {
+        let codeOptions = this.state.models.map((item, index) => {
+            return (
+                <option key={index} value={item.code}>{item.code}</option>
+            )
+        })
+        return codeOptions;
+    }
+
+    renderAvailableColorsForModel() {
+        let colors = this.state.selectedModel.colors.map((color, index) => {
+            return (
+                <option key={index} value={color.color}>{color.color}</option>
+            )
+        })
+        return colors;
     }
 
     render() {
-        const { totalGiven, totalOnStock, total, modalClass, parameterToSortBy,
-            sortDirection, searchFilter, isLoading, isDeleting, noSales, shouldUpdateInventory,
-            message } = this.state;
+        const { date, model, code, color, customerName, amountSold, priceInBolivianos, priceInSoles,
+            totalToPayInBolivianos, totalToPayInSoles, isLoading, isSavingData } = this.state;
+
+        const isInvalid = model === '' || code === '' || color === '';
+
         if (isLoading) {
             return (
                 <div>
@@ -244,152 +180,174 @@ class SalesRecordTableBase extends Component {
                 </div>
             );
         }
-        if (noSales) {
-            return (
-                <div className="column has-text-centered">
-                    <p>El cliente actual no tiene ventas registradas.</p>
-                    <br></br>
-                    <Link className="button is-success" to={"/clientes/cliente/" + this.props.customerId + "/registro-de-ventas/nueva-venta"}>Registrar nueva venta</Link>
-                </div>
-            );
-        }
         return (
-            <div>
-                <div className="columns">
-                    <div className="column has-text-centered">
-                        <Link className="button is-success" to={"/clientes/cliente/" + this.props.customerId + "/registro-de-ventas/nueva-venta"}>Registrar venta (por mayor)</Link>
-                    </div>
-                    <div className="column has-text-centered">
-                        <Link className="button is-success" to={"/clientes/cliente/" + this.props.customerId + "/registro-de-ventas/nueva-venta"}>Registrar venta (por unidad)</Link>
-                    </div>
-                    <div className="column has-text-centered">
-                        <div className="control">
-                            <input className="input" type="text" placeholder="Buscar"
-                                name="searchFilter" value={searchFilter} onChange={this.modifyStateOfSales}></input>
-                        </div>
-                    </div>
-                    <div className="column has-text-centered">
-                        <div className="columns is-mobile">
-                            <div className="column has-text-right">
-                                <label className="label">Ordenar por</label>
-                            </div>
-                            <div className="column has-text-left">
-                                <div className="field">
-                                    <div className="control has-text-left">
-                                        <div className="select is-primary">
-                                            <select name="parameterToSortBy" value={parameterToSortBy}
-                                                onChange={this.modifyStateOfSales}>
-                                                <option value="date">Fecha</option>
-                                                <option value="model">Modelo</option>
-                                                <option value="color">Color</option>
-                                                <option value="amountGiven">Se le dió</option>
-                                            </select>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div className="column">
-                        <div className="columns is-mobile">
-                            <div className="column has-text-right">
-                                <label className="label">De manera</label>
-                            </div>
-                            <div className="column has-text-left">
-                                <div className="field has-text-left">
-                                    <div className="control has-text-left">
-                                        <div className="select is-info">
-                                            <select name="sortDirection" value={sortDirection}
-                                                onChange={this.modifyStateOfSales}>
-                                                <option value="ascendant">Ascendente</option>
-                                                <option value="descendant">Descendente</option>
-                                            </select>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div className="columns is-mobile is-centered">
-                    <div className="column">
-                        <table className="table is-striped is-fullwidth">
-                            <thead>
-                                <tr className="is-selected is-link">
-                                    <th>Fecha</th>
-                                    <th>Modelo</th>
-                                    <th>Código</th>
-                                    <th>Color</th>
-                                    <th>Se le dio</th>
-                                    <th>Tiene en stock</th>
-                                    <th>Total vendido</th>
-                                    <th>Precio</th>
-                                    <th>Total (precio)</th>
-                                    <th>Total</th>
-                                    <th>Acciones</th>
-                                </tr>
-                            </thead>
-                            <tfoot>
-                                <tr>
-                                    <th></th>
-                                    <th></th>
-                                    <th></th>
-                                    <th>Total</th>
-                                    <th>{totalGiven}</th>
-                                    <th>{totalOnStock}</th>
-                                    <th></th>
-                                    <th></th>
-                                    <th></th>
-                                    <th>{total}</th>
-                                    <th></th>
-                                </tr>
-                            </tfoot>
-                            <tbody>
-                                {this.renderSales()}
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-
-                <div className={modalClass}>
-                    <div className="modal-background"></div>
-                    <div className="modal-card">
-                        <header className="modal-card-head">
-                            <p className="modal-card-title">Eliminar venta</p>
-                        </header>
-                        <section className="modal-card-body">
-                            ¿Está seguro de que desea eliminar la venta?
-                            <br></br>
-                            <br></br>
+            <div className="columns is-mobile">
+                <div className="column is-half is-offset-one-quarter">
+                    <form onSubmit={this.handleSubmit}>
+                        <div className="field">
+                            <label className="label">Fecha</label>
                             <div className="control">
-                                <label className="checkbox">
-                                    <input
-                                        type="checkbox"
-                                        name="hasOffer"
-                                        checked={shouldUpdateInventory}
-                                        onChange={this.toggleInventoryUpdateWhenDeleting}
-                                    />
-                                    Actualizar cantidad del inventario al eliminar venta
-                                </label>
+                                <input
+                                    className="input"
+                                    type="date"
+                                    placeholder="Fecha"
+                                    name="date"
+                                    value={date}
+                                    onChange={this.handleChange}
+                                />
                             </div>
-                        </section>
-                        <footer className="modal-card-foot">
-                            <button disabled={isDeleting} className="button is-danger" onClick={this.deleteSale}>Eliminar</button>
-                            <button disabled={isDeleting} className="button" onClick={this.closeModal}>Cancelar</button>
-                            {isDeleting && <p>Eliminando venta...</p>}
-                        </footer>
-                    </div>
+                        </div>
+                        <div className="field">
+                            <label className="label">Modelo</label>
+                            <div className="control">
+                                <div className="select">
+                                    <select name="model" value={model} onChange={this.changeModel}>
+                                        {!this.state.selectedModel && <option value="">-</option>}
+                                        {this.renderModelOptions()}
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        <div className="field">
+                            <label className="label">Código</label>
+                            <div className="control">
+                                <div className="select">
+                                    <select name="code" value={code} onChange={this.changeModel}>
+                                        {!this.state.selectedModel && <option value="">-</option>}
+                                        {this.renderCodeOptions()}
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        <div className="field">
+                            <label className="label">Color</label>
+                            <div className="control">
+                                <div className="select">
+                                    <select name="color" value={color} onChange={this.changeColor}>
+                                        {!this.state.selectedColor && <option value="">-</option>}
+                                        {this.state.selectedModel && this.renderAvailableColorsForModel()}
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        {this.state.selectedColor && <p>Cantidad disponible de ese color {this.state.selectedColor.amount}</p>}
+                        <div className="field">
+                            <label className="label">Se vendió a:</label>
+                            <div className="control">
+                                <input
+                                    className="input"
+                                    type="text"
+                                    placeholder="Nombre del cliente"
+                                    name="customerName"
+                                    value={customerName}
+                                    onChange={this.handleChange}
+                                />
+                            </div>
+                        </div>
+                        <div className="field">
+                            <label className="label">Vendió</label>
+                            <div className="control">
+                                <input
+                                    className="input"
+                                    type="number"
+                                    placeholder="Vendió"
+                                    name="amountSold"
+                                    value={amountSold}
+                                    onChange={this.modifyAmounts}
+                                />
+                            </div>
+                        </div>
+                        <div className="field">
+                            <label className="label">Precio</label>
+                            <div className="field-body">
+                                <div className="field">
+                                    <p className="control is-expanded has-icons-left">
+                                        <input
+                                            className="input"
+                                            type="number"
+                                            placeholder="Total"
+                                            name="priceInBolivianos"
+                                            value={priceInBolivianos}
+                                            onChange={this.modifyPrices}
+                                        />
+                                        <span className="icon is-small is-left">
+                                            Bs
+                                        </span>
+                                    </p>
+                                </div>
+                                <div className="field">
+                                    <p className="control is-expanded has-icons-left">
+                                        <input
+                                            className="input"
+                                            type="number"
+                                            placeholder="Total"
+                                            name="priceInSoles"
+                                            value={priceInSoles}
+                                            onChange={this.modifyPrices}
+                                        />
+                                        <span className="icon is-small is-left">
+                                            S/
+                                        </span>
+
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                        <div className="field">
+                            <label className="label">Total a pagar</label>
+                            <div className="field-body">
+                                <div className="field">
+                                    <p className="control is-expanded has-icons-left">
+                                        <input
+                                            className="input"
+                                            type="number"
+                                            placeholder="Total"
+                                            name="totalToPayInBolivianos"
+                                            value={totalToPayInBolivianos}
+                                            disabled
+                                        />
+                                        <span className="icon is-small is-left">
+                                            Bs
+                                        </span>
+                                    </p>
+                                </div>
+                                <div className="field">
+                                    <p className="control is-expanded has-icons-left">
+                                        <input
+                                            className="input"
+                                            type="number"
+                                            placeholder="Total"
+                                            name="totalToPayInSoles"
+                                            value={totalToPayInSoles}
+                                            disabled
+                                        />
+                                        <span className="icon is-small is-left">
+                                            S/
+                                        </span>
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                        <div className="field is-grouped">
+                            <div className="control">
+                                <button disabled={isSavingData || isInvalid} type="submit" className="button is-info">Guardar</button>
+                            </div>
+                            <div className="control">
+                                <Link disabled={isSavingData} to="/inventario" className="button is-light">Cancelar</Link>
+                            </div>
+                        </div>
+                        {isSavingData && <p>Registrando venta...</p>}
+                    </form>
                 </div>
-                {message && <p>{message}</p>}
             </div>
-        );
+        )
     }
 }
 
-const SalesRecordTable = withFirebase(SalesRecordTableBase);
+const RegisterSingleSaleForm = withRouter(withFirebase(RegisterSingleSaleFormBase));
 
 const condition = (authUser) => {
     return authUser != null;
 }
 
-export default withAuthorization(condition)(SalesRecord);
+export default withAuthorization(condition)(RegisterSingleSale);

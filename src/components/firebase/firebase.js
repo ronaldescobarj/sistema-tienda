@@ -70,6 +70,31 @@ class Firebase {
         return this.db.collection("sales").doc(id).delete();
     }
 
+    //SINGLE SALES
+    getSingleSales() {
+        return this.db.collection("singleSales").orderBy("date").get();
+    }
+
+    getSingleSaleById(id) {
+        return this.db.collection("singleSales").doc(id).get();
+    }
+
+    getSingleSalesByParameter(parameter, value) {
+        return this.db.collection("singleSales").where(parameter, "==", value).get();
+    }
+
+    registerSingleSale(singleSale) {
+        return this.db.collection("singleSales").add(singleSale);
+    }
+
+    updateSingleSale(singleSale, id) {
+        return this.db.collection("singleSales").doc(id).set(singleSale);
+    }
+
+    deleteSingleSale(id) {
+        return this.db.collection("singleSales").doc(id).delete();
+    }
+
     //CUSTOMERS
     getCustomers() {
         return this.db.collection("customers").orderBy("name").get();
