@@ -10,17 +10,12 @@ const INITIAL_STATE = {
     code: '',
     color: '',
     amountGiven: 0,
+    amountBorrowed: 0,
+    totalGiven: 0,
     amountOnStock: 0,
-    amountSoldAtRegularPrice: 0,
-    regularPriceInBolivianos: 0,
-    regularPriceInSoles: 0,
-    totalToPayOnRegularPriceInBolivianos: 0,
-    totalToPayOnRegularPriceInSoles: 0,
-    amountSoldAtOfferPrice: 0,
-    offerPriceInBolivianos: 0,
-    offerPriceInSoles: 0,
-    totalToPayOnOfferPriceInBolivianos: 0,
-    totalToPayOnOfferPriceInSoles: 0,
+    amountSold: 0,
+    priceInBolivianos: 0,
+    priceInSoles: 0,
     totalToPayInBolivianos: 0,
     totalToPayInSoles: 0,
 
@@ -59,8 +54,9 @@ class EditSaleFormBase extends Component {
         this.changeColor = this.changeColor.bind(this);
         this.recalculateTotal = this.recalculateTotal.bind(this);
         this.modifyAmounts = this.modifyAmounts.bind(this);
-        this.modifyRegularPrices = this.modifyRegularPrices.bind(this);
-        this.modifyOfferPrices = this.modifyOfferPrices.bind(this);
+        this.modifyPrices = this.modifyPrices.bind(this);
+        this.modifyGivenAmounts = this.modifyGivenAmounts.bind(this);
+        this.changeGivenAmount = this.changeGivenAmount.bind(this);
     }
 
     async componentDidMount() {
@@ -111,10 +107,8 @@ class EditSaleFormBase extends Component {
         delete sale.isLoading;
         delete sale.isSavingChanges;
         delete sale.error;
-        sale.regularPriceInBolivianos = parseFloat(sale.regularPriceInBolivianos);
-        sale.regularPriceInSoles = parseFloat(sale.regularPriceInSoles);
-        sale.offerPriceInBolivianos = parseFloat(sale.offerPriceInBolivianos);
-        sale.offerPriceInSoles = parseFloat(sale.offerPriceInSoles);
+        sale.priceInBolivianos = parseFloat(sale.priceInBolivianos);
+        sale.priceInSoles = parseFloat(sale.priceInSoles);
         sale.totalToPayInBolivianos = parseFloat(sale.totalToPayInBolivianos);
         sale.totalToPayInSoles = parseFloat(sale.totalToPayInSoles);
         return sale;
@@ -156,9 +150,9 @@ class EditSaleFormBase extends Component {
         return price * 2.05;
     }
 
-    async modifyRegularPrices(event) {
+    async modifyPrices(event) {
         let priceInBolivianos, priceInSoles;
-        if (event.target.name === "regularPriceInBolivianos") {
+        if (event.target.name === "priceInBolivianos") {
             priceInBolivianos = event.target.value;
             priceInSoles = this.convertToSoles(priceInBolivianos).toFixed(2);
         }
@@ -166,27 +160,7 @@ class EditSaleFormBase extends Component {
             priceInSoles = event.target.value;
             priceInBolivianos = this.convertToBolivianos(priceInSoles).toFixed(2);
         }
-        await this.setState({
-            regularPriceInBolivianos: priceInBolivianos,
-            regularPriceInSoles: priceInSoles
-        });
-        this.recalculateTotal();
-    }
-
-    async modifyOfferPrices(event) {
-        let priceInBolivianos, priceInSoles;
-        if (event.target.name === "offerPriceInBolivianos") {
-            priceInBolivianos = event.target.value;
-            priceInSoles = this.convertToSoles(priceInBolivianos).toFixed(2);
-        }
-        else {
-            priceInSoles = event.target.value;
-            priceInBolivianos = this.convertToBolivianos(priceInSoles).toFixed(2);
-        }
-        await this.setState({
-            offerPriceInBolivianos: priceInBolivianos,
-            offerPriceInSoles: priceInSoles
-        });
+        await this.setState({ priceInBolivianos, priceInSoles });
         this.recalculateTotal();
     }
 
@@ -196,17 +170,21 @@ class EditSaleFormBase extends Component {
         this.recalculateTotal();
     }
 
+    async modifyGivenAmounts(event) {
+        let value = parseInt(event.target.value);
+        await this.setState({ [event.target.name]: value });
+        this.changeGivenAmount();
+    }
+
+    changeGivenAmount() {
+        let totalGiven = this.state.amountGiven - this.state.amountBorrowed;
+        this.setState({ totalGiven });
+    }
+
     recalculateTotal() {
-        let totalToPayOnRegularPriceInBolivianos = this.state.regularPriceInBolivianos * this.state.amountSoldAtRegularPrice;
-        let totalToPayOnRegularPriceInSoles = this.state.regularPriceInSoles * this.state.amountSoldAtRegularPrice;
-        let totalToPayOnOfferPriceInBolivianos = this.state.offerPriceInBolivianos * this.state.amountSoldAtOfferPrice;
-        let totalToPayOnOfferPriceInSoles = this.state.offerPriceInSoles * this.state.amountSoldAtOfferPrice;
-        let totalToPayInBolivianos = (totalToPayOnRegularPriceInBolivianos + totalToPayOnOfferPriceInBolivianos).toFixed(2);
-        let totalToPayInSoles = (totalToPayOnRegularPriceInSoles + totalToPayOnOfferPriceInSoles).toFixed(2);
-        this.setState({
-            totalToPayOnRegularPriceInBolivianos, totalToPayOnRegularPriceInSoles, totalToPayOnOfferPriceInBolivianos,
-            totalToPayOnOfferPriceInSoles, totalToPayInBolivianos, totalToPayInSoles
-        });
+        let totalToPayInBolivianos = this.state.priceInBolivianos * this.state.amountSold;
+        let totalToPayInSoles = this.state.priceInSoles * this.state.amountSold;
+        this.setState({ totalToPayInBolivianos, totalToPayInSoles });
     }
 
     renderModelOptions() {
@@ -237,10 +215,8 @@ class EditSaleFormBase extends Component {
     }
 
     render() {
-        const { date, model, code, color, amountGiven, amountOnStock, amountSoldAtRegularPrice,
-            regularPriceInBolivianos, regularPriceInSoles, totalToPayOnRegularPriceInBolivianos,
-            totalToPayOnRegularPriceInSoles, amountSoldAtOfferPrice, offerPriceInBolivianos,
-            offerPriceInSoles, totalToPayOnOfferPriceInBolivianos, totalToPayOnOfferPriceInSoles,
+        const { date, model, code, color, amountGiven, amountBorrowed, totalGiven,
+            amountOnStock, amountSold, priceInBolivianos, priceInSoles,
             totalToPayInBolivianos, totalToPayInSoles, isLoading, isSavingChanges, error } = this.state;
 
         const isInvalid = model === '' || code === '' || color === '';
@@ -317,7 +293,33 @@ class EditSaleFormBase extends Component {
                                     placeholder="Se le dió"
                                     name="amountGiven"
                                     value={amountGiven}
-                                    onChange={this.handleChange}
+                                    onChange={this.modifyGivenAmounts}
+                                />
+                            </div>
+                        </div>
+                        <div className="field">
+                            <label className="label">Cantidad prestada</label>
+                            <div className="control">
+                                <input
+                                    className="input"
+                                    type="number"
+                                    placeholder="Cantidad prestada"
+                                    name="amountBorrowed"
+                                    value={amountBorrowed}
+                                    onChange={this.modifyGivenAmounts}
+                                />
+                            </div>
+                        </div>
+                        <div className="field">
+                            <label className="label">Total</label>
+                            <div className="control">
+                                <input
+                                    className="input"
+                                    type="number"
+                                    placeholder="Total"
+                                    name="totalGiven"
+                                    value={totalGiven}
+                                    disabled
                                 />
                             </div>
                         </div>
@@ -335,20 +337,20 @@ class EditSaleFormBase extends Component {
                             </div>
                         </div>
                         <div className="field">
-                            <label className="label">Vendió (precio normal)</label>
+                            <label className="label">Vendió</label>
                             <div className="control">
                                 <input
                                     className="input"
                                     type="number"
                                     placeholder="Vendió"
-                                    name="amountSoldAtRegularPrice"
-                                    value={amountSoldAtRegularPrice}
+                                    name="amountSold"
+                                    value={amountSold}
                                     onChange={this.modifyAmounts}
                                 />
                             </div>
                         </div>
                         <div className="field">
-                            <label className="label">Precio regular</label>
+                            <label className="label">Precio</label>
                             <div className="field-body">
                                 <div className="field">
                                     <p className="control is-expanded has-icons-left">
@@ -356,9 +358,9 @@ class EditSaleFormBase extends Component {
                                             className="input"
                                             type="number"
                                             placeholder="Total"
-                                            name="regularPriceInBolivianos"
-                                            value={regularPriceInBolivianos}
-                                            onChange={this.modifyRegularPrices}
+                                            name="priceInBolivianos"
+                                            value={priceInBolivianos}
+                                            onChange={this.modifyPrices}
                                         />
                                         <span className="icon is-small is-left">
                                             Bs
@@ -371,9 +373,9 @@ class EditSaleFormBase extends Component {
                                             className="input"
                                             type="number"
                                             placeholder="Total"
-                                            name="regularPriceInSoles"
-                                            value={regularPriceInSoles}
-                                            onChange={this.modifyRegularPrices}
+                                            name="priceInSoles"
+                                            value={priceInSoles}
+                                            onChange={this.modifyPrices}
                                         />
                                         <span className="icon is-small is-left">
                                             S/
@@ -384,125 +386,7 @@ class EditSaleFormBase extends Component {
                             </div>
                         </div>
                         <div className="field">
-                            <label className="label">Total a pagar (precio regular)</label>
-                            <div className="field-body">
-                                <div className="field">
-                                    <p className="control is-expanded has-icons-left">
-                                        <input
-                                            className="input"
-                                            type="number"
-                                            placeholder="Total"
-                                            name="totalToPayOnRegularPriceInBolivianos"
-                                            value={totalToPayOnRegularPriceInBolivianos}
-                                            disabled
-                                        />
-                                        <span className="icon is-small is-left">
-                                            Bs
-                                        </span>
-                                    </p>
-                                </div>
-                                <div className="field">
-                                    <p className="control is-expanded has-icons-left">
-                                        <input
-                                            className="input"
-                                            type="number"
-                                            placeholder="Total"
-                                            name="totalToPayOnRegularPriceInSoles"
-                                            value={totalToPayOnRegularPriceInSoles}
-                                            disabled
-                                        />
-                                        <span className="icon is-small is-left">
-                                            S/
-                                        </span>
-
-                                    </p>
-                                </div>
-                            </div>
-                        </div>
-                        <div className="field">
-                            <label className="label">Vendió (precio con oferta)</label>
-                            <div className="control">
-                                <input
-                                    className="input"
-                                    type="number"
-                                    placeholder="Vendió"
-                                    name="amountSoldAtOfferPrice"
-                                    value={amountSoldAtOfferPrice}
-                                    onChange={this.modifyAmounts}
-                                />
-                            </div>
-                        </div>
-                        <div className="field">
-                            <label className="label">Precio de oferta</label>
-                            <div className="field-body">
-                                <div className="field">
-                                    <p className="control is-expanded has-icons-left">
-                                        <input
-                                            className="input"
-                                            type="number"
-                                            placeholder="Total"
-                                            name="offerPriceInBolivianos"
-                                            value={offerPriceInBolivianos}
-                                            onChange={this.modifyOfferPrices}
-                                        />
-                                        <span className="icon is-small is-left">
-                                            Bs
-                                        </span>
-                                    </p>
-                                </div>
-                                <div className="field">
-                                    <p className="control is-expanded has-icons-left">
-                                        <input
-                                            className="input"
-                                            type="number"
-                                            placeholder="Total"
-                                            name="offerPriceInSoles"
-                                            value={offerPriceInSoles}
-                                            onChange={this.modifyOfferPrices}
-                                        />
-                                        <span className="icon is-small is-left">
-                                            S/
-                                        </span>
-
-                                    </p>
-                                </div>
-                            </div>
-                        </div>
-                        <div className="field-body">
-                            <div className="field">
-                                <p className="control is-expanded has-icons-left">
-                                    <input
-                                        className="input"
-                                        type="number"
-                                        placeholder="Total"
-                                        name="totalToPayOnOfferPriceInBolivianos"
-                                        value={totalToPayOnOfferPriceInBolivianos}
-                                        disabled
-                                    />
-                                    <span className="icon is-small is-left">
-                                        Bs
-                                        </span>
-                                </p>
-                            </div>
-                            <div className="field">
-                                <p className="control is-expanded has-icons-left">
-                                    <input
-                                        className="input"
-                                        type="number"
-                                        placeholder="Total"
-                                        name="totalToPayOnOfferPriceInSoles"
-                                        value={totalToPayOnOfferPriceInSoles}
-                                        disabled
-                                    />
-                                    <span className="icon is-small is-left">
-                                        S/
-                                        </span>
-
-                                </p>
-                            </div>
-                        </div>
-                        <div className="field">
-                            <label className="label">Total a pagar global</label>
+                            <label className="label">Total a pagar</label>
                             <div className="field-body">
                                 <div className="field">
                                     <p className="control is-expanded has-icons-left">
@@ -532,7 +416,6 @@ class EditSaleFormBase extends Component {
                                         <span className="icon is-small is-left">
                                             S/
                                         </span>
-
                                     </p>
                                 </div>
                             </div>
