@@ -70,8 +70,7 @@ class SalesRecordTableBase extends Component {
             this.setState({
                 allSales: sales,
                 filteredAndSortedSales: sales,
-                totalGiven: totalGiven,
-                totalInBolivianos, totalInSoles,
+                totalGiven, totalInBolivianos, totalInSoles,
                 isLoading: false
             });
         }
@@ -147,16 +146,12 @@ class SalesRecordTableBase extends Component {
         let { allSales, parameterToSortBy, sortDirection, searchFilter } = this.state;
         allSales = allSales.filter(element => element._id !== idToDelete);
         let filteredSales = this.filterSales(searchFilter, allSales);
-        let sortedSales = this.sortSales(filteredSales, parameterToSortBy, sortDirection);
-        let totalGiven = this.calculateTotal(sortedSales, "amountGiven");
-        let totalOnStock = this.calculateTotal(sortedSales, "amountOnStock");
-        let total = this.calculateTotal(sortedSales, "totalToPay");
+        let filteredAndSortedSales = this.sortSales(filteredSales, parameterToSortBy, sortDirection);
+        let totalGiven = this.calculateTotal(filteredAndSortedSales, "amountGiven");
+        let totalInBolivianos = this.calculateTotal(filteredAndSortedSales, "totalToPayInBolivianos");
+        let totalInSoles = this.calculateTotal(filteredAndSortedSales, "totalToPayInSoles");
         await this.setState({
-            allSales: allSales,
-            filteredAndSortedSales: sortedSales,
-            totalGiven: totalGiven,
-            totalOnStock: totalOnStock,
-            total: total,
+            allSales, filteredAndSortedSales, totalGiven, totalInBolivianos, totalInSoles,
             isDeleting: false,
             message: response.data.error ? response.data.error : ''
         });
@@ -179,7 +174,7 @@ class SalesRecordTableBase extends Component {
                         {sale.date}
                     </td>
                     <td>
-                        {sale.code}
+                        {sale.model}
                     </td>
                     <td>
                         {sale.color}
@@ -188,16 +183,19 @@ class SalesRecordTableBase extends Component {
                         {sale.amountGiven}
                     </td>
                     <td>
-                        {sale.amountSoldAtRegularPrice}
+                        {sale.amountBorrowed}
                     </td>
                     <td>
-                        {sale.regularPriceInBolivianos}/{sale.regularPriceInSoles}
+                        {sale.totalGiven}
                     </td>
                     <td>
-                        {sale.amountSoldAtOfferPrice}
+                        {sale.amountOnStock}
                     </td>
                     <td>
-                        {sale.offerPriceInBolivianos}/{sale.offerPriceInSoles}
+                        {sale.amountSold}
+                    </td>
+                    <td>
+                        {sale.priceInBolivianos}/{sale.priceInSoles}
                     </td>
                     <td>
                         {sale.totalToPayInBolivianos}/{sale.totalToPayInSoles}
@@ -305,13 +303,14 @@ class SalesRecordTableBase extends Component {
                             <thead>
                                 <tr className="is-selected is-link">
                                     <th>Fecha</th>
-                                    <th>Código</th>
+                                    <th>Modelo</th>
                                     <th>Color</th>
                                     <th>Se le dio</th>
-                                    <th>Total vendido</th>
-                                    <th>Precio normal</th>
-                                    <th>Total vendido (oferta)</th>
-                                    <th>Precio oferta</th>
+                                    <th>Prestó</th>
+                                    <th>Total</th>
+                                    <th>En stock</th>
+                                    <th>Vendió</th>
+                                    <th>Precio</th>
                                     <th>Total</th>
                                     <th>Acciones</th>
                                 </tr>
@@ -326,6 +325,7 @@ class SalesRecordTableBase extends Component {
                                     <th></th>
                                     <th></th>
                                     <th></th>
+                                    <th>Total</th>
                                     <th>{totalInBolivianos}/{totalInSoles}</th>
                                     <th></th>
                                 </tr>
