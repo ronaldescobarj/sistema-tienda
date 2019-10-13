@@ -161,8 +161,8 @@ class EditSingleSaleFormBase extends Component {
     }
 
     recalculateTotal() {
-        let totalToPayInBolivianos = this.state.priceInBolivianos * this.state.amountSold;
-        let totalToPayInSoles = this.state.priceInSoles * this.state.amountSold;
+        let totalToPayInBolivianos = (this.state.priceInBolivianos * this.state.amountSold).toFixed(2);
+        let totalToPayInSoles = (this.state.priceInSoles * this.state.amountSold).toFixed(2);
         this.setState({ totalToPayInBolivianos, totalToPayInSoles });
     }
 
@@ -282,6 +282,7 @@ class EditSingleSaleFormBase extends Component {
                                 <input
                                     className="input"
                                     type="number"
+                                    min="0"
                                     placeholder="Vendió"
                                     name="amountSold"
                                     value={amountSold}

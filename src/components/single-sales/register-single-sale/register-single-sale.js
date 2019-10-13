@@ -135,8 +135,8 @@ class RegisterSingleSaleFormBase extends Component {
     }
 
     recalculateTotal() {
-        let totalToPayInBolivianos = this.state.priceInBolivianos * this.state.amountSold;
-        let totalToPayInSoles = this.state.priceInSoles * this.state.amountSold;
+        let totalToPayInBolivianos = (this.state.priceInBolivianos * this.state.amountSold).toFixed(2);
+        let totalToPayInSoles = (this.state.priceInSoles * this.state.amountSold).toFixed(2);
         this.setState({ totalToPayInBolivianos, totalToPayInSoles });
     }
 
@@ -245,11 +245,12 @@ class RegisterSingleSaleFormBase extends Component {
                             </div>
                         </div>
                         <div className="field">
-                            <label className="label">Vendió</label>
+                            <label className="label">Cantidad vendida</label>
                             <div className="control">
                                 <input
                                     className="input"
                                     type="number"
+                                    min="0"
                                     placeholder="Vendió"
                                     name="amountSold"
                                     value={amountSold}
