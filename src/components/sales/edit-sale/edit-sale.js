@@ -182,8 +182,8 @@ class EditSaleFormBase extends Component {
     }
 
     recalculateTotal() {
-        let totalToPayInBolivianos = this.state.priceInBolivianos * this.state.amountSold;
-        let totalToPayInSoles = this.state.priceInSoles * this.state.amountSold;
+        let totalToPayInBolivianos = (this.state.priceInBolivianos * this.state.amountSold).toFixed(2);
+        let totalToPayInSoles = (this.state.priceInSoles * this.state.amountSold).toFixed(2);
         this.setState({ totalToPayInBolivianos, totalToPayInSoles });
     }
 
@@ -290,6 +290,7 @@ class EditSaleFormBase extends Component {
                                 <input
                                     className="input"
                                     type="number"
+                                    min="0"
                                     placeholder="Se le dió"
                                     name="amountGiven"
                                     value={amountGiven}
@@ -303,6 +304,7 @@ class EditSaleFormBase extends Component {
                                 <input
                                     className="input"
                                     type="number"
+                                    min="0"
                                     placeholder="Cantidad prestada"
                                     name="amountBorrowed"
                                     value={amountBorrowed}
@@ -329,6 +331,7 @@ class EditSaleFormBase extends Component {
                                 <input
                                     className="input"
                                     type="number"
+                                    min="0"
                                     placeholder="Tiene en stock"
                                     name="amountOnStock"
                                     value={amountOnStock}
@@ -342,6 +345,7 @@ class EditSaleFormBase extends Component {
                                 <input
                                     className="input"
                                     type="number"
+                                    min="0"
                                     placeholder="Vendió"
                                     name="amountSold"
                                     value={amountSold}
