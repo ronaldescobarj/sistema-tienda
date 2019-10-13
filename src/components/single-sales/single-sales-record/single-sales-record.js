@@ -139,7 +139,7 @@ class SingleSalesRecordTableBase extends Component {
     async deleteSale() {
         let idToDelete = this.state.idToDelete;
         await this.setState({ isDeleting: true });
-        let response = await axios.delete('https://us-central1-sistema-tienda-c6c67.cloudfunctions.net/deleteSale',
+        let response = await axios.delete('https://us-central1-sistema-tienda-c6c67.cloudfunctions.net/deleteSingleSale',
             {
                 data: {
                     shouldUpdateInventory: this.state.shouldUpdateInventory,
@@ -234,7 +234,7 @@ class SingleSalesRecordTableBase extends Component {
         if (noSales) {
             return (
                 <div className="column has-text-centered">
-                    <p>El cliente actual no tiene ventas registradas.</p>
+                    <p>No hay ventas individuales registradas.</p>
                     <br></br>
                     <Link className="button is-success" to={"/ventas-individuales/nueva-venta-individual"}>Registrar nueva venta</Link>
                 </div>

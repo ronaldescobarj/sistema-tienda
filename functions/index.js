@@ -149,7 +149,32 @@ exports.deleteSale = functions.https.onRequest((req, res) => {
                     itemId = element.id;
                     item = element.data();
                 });
-                item.amount = item.amount + amountToAdd;
+                item.amount = item.amount + parseInt(amountToAdd);
+                await db.collection("inventory").doc(itemId).set(item);
+            }
+        }
+        res.send({ success: true });
+    })
+})
+
+exports.deleteSingleSale = functions.https.onRequest((req, res) => {
+    return cors(req, res, async () => {
+        let shouldUpdateInventory = req.body.shouldUpdateInventory;
+        let sale = req.body.sale;
+        let amountToAdd = sale.amountSold;
+        let saleId = sale._id;
+        await db.collection("singleSales").doc(saleId).delete();
+        if (shouldUpdateInventory) {
+            let response = await db.collection("inventory").where("name", "==", sale.model).where("code", "==", sale.code).where("color", "==", sale.color).get();
+            if (response.empty)
+                res.send({ error: "No se pudieron actualizar los cambios en el inventario ya que el item de la venta eliminada ya no existe en el inventario" });
+            else {
+                let itemId, item;
+                response.forEach((element) => {
+                    itemId = element.id;
+                    item = element.data();
+                });
+                item.amount = item.amount + parseInt(amountToAdd);
                 await db.collection("inventory").doc(itemId).set(item);
             }
         }
