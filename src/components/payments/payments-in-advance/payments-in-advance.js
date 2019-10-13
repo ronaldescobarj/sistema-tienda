@@ -21,7 +21,7 @@ const INITIAL_STATE = {
 
 const PaymentsInAdvance = ({ match }) => (
     <div>
-        <section className="hero is-small is-primary">
+        <section className="hero is-small is-light">
             <div className="hero-body">
                 <div className="container has-text-centered">
                     <h1 className="title">

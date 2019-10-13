@@ -122,7 +122,7 @@ class Firebase {
 
     //PAYMENTS
     getPayments() {
-        return this.db.collection("payments").orderBy("date").get();
+        return this.db.collection("payments").orderBy("numberOfPayment").get();
     }
 
     getPaymentById(id) {

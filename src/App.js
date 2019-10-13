@@ -16,7 +16,6 @@ import AddCustomer from './components/customers/add-customer/add-customer';
 import SalesRecord from './components/sales/sales-record/sales-record';
 import EditSale from './components/sales/edit-sale/edit-sale';
 import RegisterSale from './components/sales/register-sale/register-sale';
-import PaymentsInAdvance from './components/payments/payments-in-advance/payments-in-advance';
 import AddPayment from './components/payments/add-payment/add-payment';
 import EditPayment from './components/payments/edit-payment/edit-payment';
 import RegisterSingleSale from './components/single-sales/register-single-sale/register-single-sale';
@@ -49,7 +48,6 @@ function App() {
         <Route exact path="/clientes/cliente/:customerId/registro-de-ventas" component={SalesRecord} />
         <Route exact path="/clientes/cliente/:customerId/registro-de-ventas/nueva-venta" component={RegisterSale} />
         <Route path="/clientes/cliente/:customerId/registro-de-ventas/venta/:saleId" component={EditSale} />
-        <Route exact path="/clientes/cliente/:customerId/adelantos-de-pago" component={PaymentsInAdvance} />
         <Route exact path="/clientes/cliente/:customerId/adelantos-de-pago/nuevo-pago" component={AddPayment} />
         <Route path="/clientes/cliente/:customerId/adelantos-de-pago/pago/:paymentId" component={EditPayment} />
         <Route path="/editar-cuenta" component={EditAccount} />

@@ -131,12 +131,7 @@ class CustomersTableBase extends Component {
                             </p>
                             <p className="control">
                                 <Link className="button is-success" to={"/clientes/cliente/" + customer._id + "/registro-de-ventas"}>
-                                    Ver ventas
-                                </Link>
-                            </p>
-                            <p className="control">
-                                <Link className="button is-warning" to={"/clientes/cliente/" + customer._id + "/adelantos-de-pago"}>
-                                    Ver adelantos de pago
+                                    Ver ventas y pagos
                                 </Link>
                             </p>
                             <p className="control">
