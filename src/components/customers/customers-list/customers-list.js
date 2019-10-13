@@ -77,7 +77,7 @@ class CustomersTableBase extends Component {
     filterCustomers(searchTerm, customersList) {
         let filteredCustomers = [];
         for (let customer of customersList) {
-            if (customer.name.includes(searchTerm))
+            if (customer.name.toLowerCase().includes(searchTerm.toLowerCase()))
                 filteredCustomers.push(customer);
         }
         return filteredCustomers;

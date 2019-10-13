@@ -93,7 +93,7 @@ class ItemsListTableBase extends Component {
         for (let item of itemsList) {
             for (let property in item) {
                 if (property !== "_id") {
-                    if (item[property].toString().includes(searchTerm)) {
+                    if (item[property].toString().toLowerCase().includes(searchTerm.toLowerCase())) {
                         filteredItems.push(item);
                         break;
                     }

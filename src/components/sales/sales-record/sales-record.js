@@ -112,7 +112,7 @@ class SalesRecordTableBase extends Component {
         for (let sale of salesList) {
             for (let property in sale) {
                 if (property !== "_id") {
-                    if (sale[property].toString().includes(searchTerm)) {
+                    if (sale[property].toString().toLowerCase().includes(searchTerm.toLowerCase())) {
                         filteredSales.push(sale);
                         break;
                     }
