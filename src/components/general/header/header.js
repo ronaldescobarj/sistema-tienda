@@ -37,10 +37,10 @@ class Header extends React.Component {
                                     <Link to="/inventario" className="button is-link">Inventario</Link>
                                 </div>
                                 <div className="navbar-item">
-                                    <Link to="/ventas-individuales" className="button is-link">Ventas individuales</Link>
+                                    <Link to="/clientes" className="button is-link">Ventas y clientes</Link>
                                 </div>
                                 <div className="navbar-item">
-                                    <Link to="/clientes" className="button is-link">Ventas y clientes</Link>
+                                    <Link to="/ventas-individuales" className="button is-link">Ventas individuales</Link>
                                 </div>
                                 <div className="navbar-item">
                                     <Link to="/" className="button is-link">Ver guía</Link>

@@ -88,7 +88,7 @@ class AddItemFormBase extends Component {
                         <div className="field">
                             <label className="label">Cantidad</label>
                             <div className="control">
-                                <input className="input" type="number" placeholder="Cantidad"
+                                <input className="input" type="number" min="0" placeholder="Cantidad"
                                     name="amount" value={amount} onChange={this.handleChange}></input>
                             </div>
                         </div>
