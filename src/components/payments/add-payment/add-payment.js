@@ -45,7 +45,7 @@ class AddPaymentFormBase extends Component {
         await this.setState({ isSavingData: true });
         await this.props.firebase.addPayment(payment);
         this.setState({ ...INITIAL_STATE });
-        this.props.history.push("/clientes/cliente/" + this.props.customerId + "/adelantos-de-pago");
+        this.props.history.push("/clientes/cliente/" + this.props.customerId + "/registro-de-ventas");
     }
 
     handleChange(event) {

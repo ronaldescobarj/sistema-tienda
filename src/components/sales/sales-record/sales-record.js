@@ -3,6 +3,7 @@ import { withFirebase } from '../../../providers/firebase';
 import { Link } from "react-router-dom";
 import { withAuthorization } from '../../../providers/session';
 import axios from 'axios';
+import PaymentsInAdvance from '../../payments/payments-in-advance/payments-in-advance';
 
 const INITIAL_STATE = {
     allSales: [],
@@ -367,6 +368,7 @@ class SalesRecordTableBase extends Component {
                     </div>
                 </div>
                 {message && <p>{message}</p>}
+                <PaymentsInAdvance></PaymentsInAdvance>
             </div>
         );
     }
