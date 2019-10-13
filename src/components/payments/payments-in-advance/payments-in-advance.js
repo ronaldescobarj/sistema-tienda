@@ -6,7 +6,8 @@ import { withAuthorization } from '../../../providers/session';
 const INITIAL_STATE = {
     allPayments: [],
     filteredAndSortedPayments: [],
-    total: 0,
+    totalInBolivianos: 0,
+    totalInSoles: 0,
     modalClass: "modal",
     idToDelete: '',
     parameterToSortBy: 'date',
@@ -51,19 +52,20 @@ class PaymentsInAdvanceTableBase extends Component {
 
     async getData() {
         let payments = [];
-        let total = 0;
+        let totalInBolivianos = 0, totalInSoles = 0;
         let response = await this.props.firebase.getPaymentsByParameter("customerId", this.props.customerId);
         if (!response.empty) {
             response.forEach(doc => {
                 let payment = doc.data();
                 payment["_id"] = doc.id;
                 payments.push(payment);
-                total += parseInt(payment.amountPaid);
+                totalInBolivianos += parseFloat(payment.amountPaidInBolivianos);
+                totalInSoles += parseFloat(payment.amountPaidInSoles);
             });
             this.setState({
                 allPayments: payments,
                 filteredAndSortedPayments: payments,
-                total: total,
+                totalInBolivianos, totalInSoles,
                 isLoading: false
             });
         }
@@ -76,10 +78,10 @@ class PaymentsInAdvanceTableBase extends Component {
         return payments.find(payment => payment._id === id);
     }
 
-    calculateTotal(payments) {
+    calculateTotal(payments, parameter) {
         let total = 0;
         payments.forEach(payment => {
-            total += parseInt(payment.amountPaid);
+            total += parseInt(payment[parameter]);
         })
         return total;
     }
@@ -89,10 +91,11 @@ class PaymentsInAdvanceTableBase extends Component {
         let { allPayments, parameterToSortBy, sortDirection, searchFilter } = this.state;
         let filteredPayments = this.filterPayments(searchFilter, allPayments);
         let sortedPayments = this.sortPayments(filteredPayments, parameterToSortBy, sortDirection);
-        let total = this.calculateTotal(sortedPayments, "amountPaid");
+        let totalInBolivianos = this.calculateTotal(sortedPayments, "amountPaidInBolivianos");
+        let totalInSoles = this.calculateTotal(sortedPayments, "amountPaidInSoles");
         this.setState({
             filteredAndSortedPayments: sortedPayments,
-            total: total
+            totalInBolivianos, totalInSoles
         });
     }
 
@@ -131,15 +134,12 @@ class PaymentsInAdvanceTableBase extends Component {
         allPayments = allPayments.filter(element => element._id !== idToDelete);
         let filteredPayments = this.filterPayments(searchFilter, allPayments);
         let sortedPayments = this.sortPayments(filteredPayments, parameterToSortBy, sortDirection);
-        let totalGiven = this.calculateTotal(sortedPayments, "amountGiven");
-        let totalOnStock = this.calculateTotal(sortedPayments, "amountOnStock");
-        let total = this.calculateTotal(sortedPayments, "totalToPay");
+        let totalInBolivianos = this.calculateTotal(sortedPayments, "amountPaidInBolivianos");
+        let totalInSoles = this.calculateTotal(sortedPayments, "amountPaidInSoles");
         this.setState({
             allPayments: allPayments,
             filteredAndSortedPayments: sortedPayments,
-            totalGiven: totalGiven,
-            totalOnStock: totalOnStock,
-            total: total,
+            totalInBolivianos, totalInSoles,
             isDeleting: false,
         });
         this.closeModal();
@@ -164,7 +164,10 @@ class PaymentsInAdvanceTableBase extends Component {
                         {payment.numberOfPayment}
                     </td>
                     <td>
-                        {payment.amountPaid}
+                        {payment.amountPaidInBolivianos}
+                    </td>
+                    <td>
+                        {payment.amountPaidInSoles}
                     </td>
                     <td>
                         <div className="field has-addons">
@@ -189,7 +192,7 @@ class PaymentsInAdvanceTableBase extends Component {
     }
 
     render() {
-        const { total, modalClass, parameterToSortBy,
+        const { totalInBolivianos, totalInSoles, modalClass, parameterToSortBy,
             sortDirection, searchFilter, isLoading, isDeleting, noPayments } = this.state;
         if (isLoading) {
             return (
@@ -268,15 +271,17 @@ class PaymentsInAdvanceTableBase extends Component {
                                 <tr className="is-selected is-link">
                                     <th>Fecha</th>
                                     <th>Número</th>
-                                    <th>Cantidad pagada</th>
+                                    <th>Cantidad pagada Bs</th>
+                                    <th>Cantidad pagada S/</th>
                                     <th>Acciones</th>
                                 </tr>
                             </thead>
                             <tfoot>
                                 <tr>
                                     <th></th>
-                                    <th>Total</th>
-                                    <th>{total}</th>
+                                    <th></th>
+                                    <th>{totalInBolivianos}</th>
+                                    <th>{totalInSoles}</th>
                                     <th></th>
                                 </tr>
                             </tfoot>

@@ -343,7 +343,6 @@ class RegisterSaleFormBase extends Component {
                                         <span className="icon is-small is-left">
                                             S/
                                         </span>
-
                                     </p>
                                 </div>
                             </div>
