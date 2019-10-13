@@ -311,8 +311,8 @@ class SalesRecordTableBase extends Component {
                                     <th>Total</th>
                                     <th>En stock</th>
                                     <th>Vendió</th>
-                                    <th>Precio</th>
-                                    <th>Total</th>
+                                    <th>Precio Bs/S</th>
+                                    <th>Total Bs/S</th>
                                     <th>Acciones</th>
                                 </tr>
                             </thead>

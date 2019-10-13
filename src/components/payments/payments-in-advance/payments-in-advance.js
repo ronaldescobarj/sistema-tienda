@@ -10,7 +10,7 @@ const INITIAL_STATE = {
     totalInSoles: 0,
     modalClass: "modal",
     idToDelete: '',
-    parameterToSortBy: 'date',
+    parameterToSortBy: 'numberOfPayment',
     sortDirection: 'ascendant',
     searchFilter: '',
     isLoading: true,
@@ -233,8 +233,8 @@ class PaymentsInAdvanceTableBase extends Component {
                                         <div className="select is-primary">
                                             <select name="parameterToSortBy" value={parameterToSortBy}
                                                 onChange={this.modifyStateOfPayments}>
-                                                <option value="date">Fecha</option>
                                                 <option value="numberOfPayment">Numero de pago</option>
+                                                <option value="date">Fecha</option>
                                                 <option value="amountPaid">Cantidad pagada</option>
                                             </select>
                                         </div>
