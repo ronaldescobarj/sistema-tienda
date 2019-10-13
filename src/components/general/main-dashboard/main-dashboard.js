@@ -21,8 +21,11 @@ class MainDashboard extends Component {
                             <br></br>
                             <p><b>Ventas y clientes: </b>Haciendo clic en esa opción podremos ver una lista de los clientes. A su vez, podremos registrar nuevos
                             clientes, editar los ya existentes, o eliminar clientes.
-                            Y a través de cada cliente podremos acceder a sus ventas registradas mediante la opción "ver ventas". En esta interfaz podremos registrar
-                            nuevas ventas a ese cliente, editar la información de las ventas existentes o eliminar ventas.</p>
+                            Y a través de cada cliente podremos acceder a sus ventas registradas y a los pagos que estos realizaron mediante la opción "ver ventas y pagos".
+                            En esta interfaz podremos registrar nuevas ventas y pagos a ese cliente, editar la información de las ventas y pagos ya existentes y eliminar ventas.</p>
+                            <br></br>
+                            <p><b>Ventas individuales: </b>Haciendo clic en esa opción podremos ver una lista de ventas al por menor. Desde ahí podemos registrar, editar o
+                            eliminar ventas al por menor.</p>
                             <br></br>
                             <p><b>Ver guía: </b>Haciendo clic en esa opción podremos volver a esta ventana.</p>
                             <br></br>
