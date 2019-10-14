@@ -15,6 +15,7 @@ const INITIAL_STATE = {
     priceInSoles: 0,
     totalToPayInBolivianos: 0,
     totalToPayInSoles: 0,
+    commentary: '',
 
     models: [],
     selectedModel: null,
@@ -195,7 +196,7 @@ class EditSingleSaleFormBase extends Component {
 
     render() {
         const { date, model, code, color, customerName, amountSold, priceInBolivianos,
-            priceInSoles, totalToPayInBolivianos, totalToPayInSoles, isLoading,
+            priceInSoles, totalToPayInBolivianos, totalToPayInSoles, commentary, isLoading,
             isSavingChanges, error } = this.state;
 
         const isInvalid = model === '' || code === '' || color === '';
@@ -358,6 +359,18 @@ class EditSingleSaleFormBase extends Component {
                                         </span>
                                     </p>
                                 </div>
+                            </div>
+                        </div>
+                        <div class="field">
+                            <label class="label">Comentario</label>
+                            <div class="control">
+                                <textarea
+                                    class="textarea"
+                                    placeholder="Comentario"
+                                    name="commentary"
+                                    value={commentary}
+                                    onChange={this.handleChange}
+                                ></textarea>
                             </div>
                         </div>
                         <div className="field is-grouped">
