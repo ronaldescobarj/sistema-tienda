@@ -39,11 +39,13 @@ class LoginFormBase extends Component {
         await this.setState({ isLoggingIn: true });
         try {
             await this.props.firebase.login(email, password);
+            this.setState({ ...INITIAL_STATE });
+            this.props.history.push("/");
         } catch (error) {
+            console.log(error);
             this.setState({ error: this.translateErrorMessage(error), isLoggingIn: false });
         }
-        this.setState({ ...INITIAL_STATE });
-        this.props.history.push("/");
+        
     }
 
     translateErrorMessage(error) {
@@ -52,6 +54,8 @@ class LoginFormBase extends Component {
                 return "No existe un usuario registrado con este correo electrónico.";
             case "auth/wrong-password":
                 return "Contraseña incorrecta.";
+            case "auth/too-many-requests":
+                return "Demasiados intentos. Intente de nuevo más tarde.";
             default:
                 return "Error al iniciar sesión.";
         }
