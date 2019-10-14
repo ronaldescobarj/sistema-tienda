@@ -4,6 +4,7 @@ import { withFirebase } from '../../../providers/firebase';
 import { Link } from "react-router-dom";
 import { withAuthorization } from '../../../providers/session';
 import axios from 'axios';
+import parseDate from '../../../utils/date-parser';
 
 const INITIAL_STATE = {
     allSales: [],
@@ -178,7 +179,7 @@ class SingleSalesRecordTableBase extends Component {
             return (
                 <tr key={sale._id}>
                     <td>
-                        {sale.date}
+                        {parseDate(sale.date)}
                     </td>
                     <td>
                         {sale.code}

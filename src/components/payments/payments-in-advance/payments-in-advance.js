@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import { withFirebase } from '../../../providers/firebase';
 import { Link } from "react-router-dom";
 import { withAuthorization } from '../../../providers/session';
+import parseDate from '../../../utils/date-parser';
 
 const INITIAL_STATE = {
     allPayments: [],
@@ -158,7 +159,7 @@ class PaymentsInAdvanceTableBase extends Component {
             return (
                 <tr key={payment._id}>
                     <td>
-                        {payment.date}
+                        {parseDate(payment.date)}
                     </td>
                     <td>
                         {payment.numberOfPayment}

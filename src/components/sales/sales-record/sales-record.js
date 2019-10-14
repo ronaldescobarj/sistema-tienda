@@ -4,6 +4,7 @@ import { Link } from "react-router-dom";
 import { withAuthorization } from '../../../providers/session';
 import axios from 'axios';
 import PaymentsInAdvance from '../../payments/payments-in-advance/payments-in-advance';
+import parseDate from '../../../utils/date-parser';
 
 const INITIAL_STATE = {
     allSales: [],
@@ -172,7 +173,7 @@ class SalesRecordTableBase extends Component {
             return (
                 <tr key={sale._id}>
                     <td>
-                        {sale.date}
+                        {parseDate(sale.date)}
                     </td>
                     <td>
                         {sale.model}
