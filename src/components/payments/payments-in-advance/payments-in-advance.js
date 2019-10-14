@@ -63,6 +63,7 @@ class PaymentsInAdvanceTableBase extends Component {
                 totalInBolivianos += parseFloat(payment.amountPaidInBolivianos);
                 totalInSoles += parseFloat(payment.amountPaidInSoles);
             });
+            payments = this.sortPayments(payments, "numberOfPayment", "ascendant");
             this.setState({
                 allPayments: payments,
                 filteredAndSortedPayments: payments,

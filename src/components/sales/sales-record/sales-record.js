@@ -69,6 +69,7 @@ class SalesRecordTableBase extends Component {
                 totalInBolivianos += parseFloat(sale.totalToPayInBolivianos);
                 totalInSoles += parseFloat(sale.totalToPayInSoles);
             });
+            sales = this.sortSales(sales, "date", "ascendant")
             this.setState({
                 allSales: sales,
                 filteredAndSortedSales: sales,
