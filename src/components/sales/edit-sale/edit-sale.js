@@ -20,6 +20,7 @@ const INITIAL_STATE = {
     totalToPayInSoles: 0,
     commentary: '',
 
+    previousAmountBorrowed: 0,
     models: [],
     selectedModel: null,
     selectedColor: null,
@@ -77,9 +78,9 @@ class EditSaleFormBase extends Component {
             await this.setState(sale);
             let selectedModel = this.getSelectedModel(sale, this.state.models);
             let selectedColor = this.getSelectedColor(sale.color, selectedModel);
+            let previousAmountBorrowed = this.state.amountBorrowed;
             this.setState({
-                selectedModel: selectedModel,
-                selectedColor: selectedColor,
+                selectedModel, selectedColor, previousAmountBorrowed,
                 isLoading: false
             });
         }
@@ -102,6 +103,7 @@ class EditSaleFormBase extends Component {
     createSaleObject(state) {
         let sale = JSON.parse(JSON.stringify(state));
         sale.customerId = this.props.customerId;
+        delete sale.previousAmountBorrowed;
         delete sale.models;
         delete sale.selectedModel;
         delete sale.selectedColor;
@@ -172,14 +174,20 @@ class EditSaleFormBase extends Component {
     }
 
     async modifyGivenAmounts(event) {
-        let value = parseInt(event.target.value);
+        let rawValue = event.target.value;
+        let value = parseInt(rawValue);
         await this.setState({ [event.target.name]: value });
-        this.changeGivenAmount();
+        if (rawValue !== "")
+            this.changeGivenAmount();
     }
 
     changeGivenAmount() {
+        let previousAmountBorrowed = this.state.amountBorrowed;
+        let amountBorrowedDifference = this.state.amountBorrowed - this.state.previousAmountBorrowed;
         let totalGiven = this.state.amountGiven - this.state.amountBorrowed;
-        this.setState({ totalGiven });
+        let amountOnStock = this.state.amountOnStock - amountBorrowedDifference;
+        this.setState({ totalGiven, amountOnStock, previousAmountBorrowed });
+
     }
 
     recalculateTotal() {
@@ -310,9 +318,11 @@ class EditSaleFormBase extends Component {
                                     name="amountBorrowed"
                                     value={amountBorrowed}
                                     onChange={this.modifyGivenAmounts}
+                                    disabled={amountOnStock === 0}
                                 />
                             </div>
                         </div>
+                        { amountOnStock === 0 &&  <p>No se puede realizar un préstamo ya que no quedan unidades en stock.</p>}
                         <div className="field">
                             <label className="label">Total</label>
                             <div className="control">
