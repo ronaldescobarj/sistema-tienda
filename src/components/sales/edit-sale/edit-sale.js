@@ -79,10 +79,7 @@ class EditSaleFormBase extends Component {
             let selectedModel = this.getSelectedModel(sale, this.state.models);
             let selectedColor = this.getSelectedColor(sale.color, selectedModel);
             let previousAmountBorrowed = this.state.amountBorrowed;
-            this.setState({
-                selectedModel, selectedColor, previousAmountBorrowed,
-                isLoading: false
-            });
+            this.setState({ selectedModel, selectedColor, previousAmountBorrowed, isLoading: false });
         }
         else {
             this.setState({
@@ -187,7 +184,6 @@ class EditSaleFormBase extends Component {
         let totalGiven = this.state.amountGiven - this.state.amountBorrowed;
         let amountOnStock = this.state.amountOnStock - amountBorrowedDifference;
         this.setState({ totalGiven, amountOnStock, previousAmountBorrowed });
-
     }
 
     recalculateTotal() {
@@ -318,7 +314,7 @@ class EditSaleFormBase extends Component {
                                     name="amountBorrowed"
                                     value={amountBorrowed}
                                     onChange={this.modifyGivenAmounts}
-                                    disabled={amountOnStock === 0}
+                                    max={amountBorrowed + amountOnStock}
                                 />
                             </div>
                         </div>
