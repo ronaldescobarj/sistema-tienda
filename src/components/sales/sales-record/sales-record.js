@@ -89,7 +89,7 @@ class SalesRecordTableBase extends Component {
     calculateTotal(sales, parameter) {
         let total = 0;
         sales.forEach(sale => {
-            total += parseInt(sale[parameter]);
+            total += parseFloat(sale[parameter]);
         })
         return total;
     }

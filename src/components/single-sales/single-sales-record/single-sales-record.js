@@ -66,8 +66,8 @@ class SingleSalesRecordTableBase extends Component {
                 sale["_id"] = doc.id;
                 sales.push(sale);
                 totalSold += parseInt(sale.amountSold);
-                totalInBolivianos += parseInt(sale.totalToPayInBolivianos);
-                totalInSoles += parseInt(sale.totalToPayInSoles);
+                totalInBolivianos += parseFloat(sale.totalToPayInBolivianos);
+                totalInSoles += parseFloat(sale.totalToPayInSoles);
             });
             this.setState({
                 allSales: sales,
@@ -90,7 +90,7 @@ class SingleSalesRecordTableBase extends Component {
     calculateTotal(sales, parameter) {
         let total = 0;
         sales.forEach(sale => {
-            total += parseInt(sale[parameter]);
+            total += parseFloat(sale[parameter]);
         })
         return total;
     }
