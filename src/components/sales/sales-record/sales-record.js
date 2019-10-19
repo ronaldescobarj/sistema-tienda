@@ -242,6 +242,9 @@ class SalesRecordTableBase extends Component {
                     <p>El cliente actual no tiene ventas registradas.</p>
                     <br></br>
                     <Link className="button is-success" to={"/clientes/cliente/" + this.props.customerId + "/registro-de-ventas/nueva-venta"}>Registrar nueva venta</Link>
+                    <br></br>
+                    <br></br>
+                    <PaymentsInAdvance></PaymentsInAdvance>
                 </div>
             );
         }

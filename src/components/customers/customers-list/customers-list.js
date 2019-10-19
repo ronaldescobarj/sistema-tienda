@@ -126,7 +126,7 @@ class CustomersTableBase extends Component {
                         <div className="field has-addons">
                             <p className="control">
                                 <Link className="button is-info" to={"/clientes/cliente/" + customer._id}>
-                                    Cambiar nombre
+                                    Editar nombre
                                 </Link>
                             </p>
                             <p className="control">

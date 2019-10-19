@@ -66,7 +66,7 @@ class AddCustomerFormBase extends Component {
                                 <Link disabled={isSavingData} to="/clientes" className="button is-light">Cancelar</Link>
                             </div>
                         </div>
-                        {isSavingData && <p>Guardando item...</p>}
+                        {isSavingData && <p>Registrando cliente...</p>}
                     </form>
                 </div>
             </div>

@@ -206,9 +206,9 @@ class PaymentsInAdvanceTableBase extends Component {
         if (noPayments) {
             return (
                 <div className="column has-text-centered">
-                    <p>El cliente actual no tiene ventas registradas.</p>
+                    <p>El cliente actual no tiene pagos registrados.</p>
                     <br></br>
-                    <Link className="button is-success" to={"/clientes/cliente/" + this.props.customerId + "/registro-de-ventas/nueva-venta"}>Registrar nueva venta</Link>
+                    <Link className="button is-success" to={"/clientes/cliente/" + this.props.customerId + "/registro-de-ventas/nueva-venta"}>Registrar nuevo pago</Link>
                 </div>
             );
         }
