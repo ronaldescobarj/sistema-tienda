@@ -347,7 +347,7 @@ class RegisterSingleSaleFormBase extends Component {
                                 <button disabled={isSavingData || isInvalid} type="submit" className="button is-info">Guardar</button>
                             </div>
                             <div className="control">
-                                <Link disabled={isSavingData} to="/inventario" className="button is-light">Cancelar</Link>
+                                <Link disabled={isSavingData} to="/ventas-individuales" className="button is-light">Cancelar</Link>
                             </div>
                         </div>
                         {isSavingData && <p>Registrando venta...</p>}

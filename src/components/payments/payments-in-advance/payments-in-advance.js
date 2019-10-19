@@ -208,7 +208,7 @@ class PaymentsInAdvanceTableBase extends Component {
                 <div className="column has-text-centered">
                     <p>El cliente actual no tiene pagos registrados.</p>
                     <br></br>
-                    <Link className="button is-success" to={"/clientes/cliente/" + this.props.customerId + "/registro-de-ventas/nueva-venta"}>Registrar nuevo pago</Link>
+                    <Link className="button is-success" to={"/clientes/cliente/" + this.props.customerId + "/adelantos-de-pago/nuevo-pago"}>Registrar nuevo pago</Link>
                 </div>
             );
         }

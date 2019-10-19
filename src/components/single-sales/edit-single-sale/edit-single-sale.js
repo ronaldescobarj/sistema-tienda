@@ -378,7 +378,7 @@ class EditSingleSaleFormBase extends Component {
                                 <button disabled={isSavingChanges || isInvalid} type="submit" className="button is-info">Guardar cambios</button>
                             </div>
                             <div className="control">
-                                <Link disabled={isSavingChanges} to="/inventario" className="button is-light">Cancelar</Link>
+                                <Link disabled={isSavingChanges} to="/ventas-individuales" className="button is-light">Cancelar</Link>
                             </div>
                         </div>
                         {isSavingChanges && <p>Guardando cambios...</p>}

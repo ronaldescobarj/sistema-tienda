@@ -30,7 +30,7 @@ const SingleSalesRecord = ({ match }) => (
             <div className="hero-body">
                 <div className="container has-text-centered">
                     <h1 className="title">
-                        Registro de ventas
+                        Registro de ventas individuales
                     </h1>
                 </div>
             </div>

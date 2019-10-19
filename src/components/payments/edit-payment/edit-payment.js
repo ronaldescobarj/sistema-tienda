@@ -177,7 +177,7 @@ class EditPaymentFormBase extends Component {
                                 <button disabled={isSavingChanges} type="submit" className="button is-info">Guardar</button>
                             </div>
                             <div className="control">
-                                <Link disabled={isSavingChanges} to="/inventario" className="button is-light">Cancelar</Link>
+                                <Link disabled={isSavingChanges} to={"/clientes/cliente/" + this.props.customerId + "/registro-de-ventas"} className="button is-light">Cancelar</Link>
                             </div>
                         </div>
                         {isSavingChanges && <p>Guardando cambios...</p>}
