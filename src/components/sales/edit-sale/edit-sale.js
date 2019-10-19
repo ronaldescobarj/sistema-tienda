@@ -171,19 +171,23 @@ class EditSaleFormBase extends Component {
     }
 
     async modifyGivenAmounts(event) {
+        let parameter = event.target.name;
         let rawValue = event.target.value;
         let value = parseInt(rawValue);
-        await this.setState({ [event.target.name]: value });
+        await this.setState({ [parameter]: value });
         if (rawValue !== "")
-            this.changeGivenAmount();
+            this.changeGivenAmount(parameter);
     }
 
-    changeGivenAmount() {
+    changeGivenAmount(parameter) {
         let previousAmountBorrowed = this.state.amountBorrowed;
         let amountBorrowedDifference = this.state.amountBorrowed - this.state.previousAmountBorrowed;
         let totalGiven = this.state.amountGiven - this.state.amountBorrowed;
         let amountOnStock = this.state.amountOnStock - amountBorrowedDifference;
-        this.setState({ totalGiven, amountOnStock, previousAmountBorrowed });
+        if (parameter === "amountBorrowed")
+            this.setState({ totalGiven, amountOnStock, previousAmountBorrowed });
+        else
+            this.setState({ totalGiven });
     }
 
     recalculateTotal() {
