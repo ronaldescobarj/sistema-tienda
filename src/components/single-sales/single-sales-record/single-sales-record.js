@@ -297,7 +297,7 @@ class SingleSalesRecordTableBase extends Component {
                     </div>
                 </div>
                 <div className="columns is-mobile is-centered">
-                    <div className="column">
+                    <div style={{ overflowX: 'auto' }} className="column">
                         <table className="table is-striped is-fullwidth">
                             <thead>
                                 <tr className="is-selected is-link">
