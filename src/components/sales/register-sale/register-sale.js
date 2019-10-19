@@ -285,6 +285,7 @@ class RegisterSaleFormBase extends Component {
                                     placeholder="Total"
                                     name="totalGiven"
                                     value={totalGiven}
+                                    onChange={this.handleChange}
                                 />
                             </div>
                         </div>
