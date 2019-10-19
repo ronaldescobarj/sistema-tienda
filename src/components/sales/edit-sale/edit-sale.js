@@ -332,7 +332,6 @@ class EditSaleFormBase extends Component {
                                     placeholder="Total"
                                     name="totalGiven"
                                     value={totalGiven}
-                                    disabled
                                 />
                             </div>
                         </div>
