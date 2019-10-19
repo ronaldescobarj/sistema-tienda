@@ -9,12 +9,17 @@ class Header extends React.Component {
         super(props);
         this.state = { navbarClass: 'navbar-menu' };
         this.toggleNavbarClass = this.toggleNavbarClass.bind(this);
+        this.closeBurger = this.closeBurger.bind(this);
     }
 
     async toggleNavbarClass() {
         let currentNavbarClass = this.state.navbarClass;
         let newNavbarClass = currentNavbarClass === "navbar-menu" ? "navbar-menu is-active" : "navbar-menu";
         await this.setState({ navbarClass: newNavbarClass });
+    }
+
+    closeBurger() {
+        this.setState({ navbarClass: 'navbar-menu' });
     }
 
     render() {
@@ -34,22 +39,22 @@ class Header extends React.Component {
                         {authUser => authUser ? <div id="myNavbar" className={navbarClass}>
                             <div className="navbar-start">
                                 <div className="navbar-item">
-                                    <Link to="/inventario" className="button is-link">Inventario</Link>
+                                    <Link onClick={this.closeBurger} to="/inventario" className="button is-link">Inventario</Link>
                                 </div>
                                 <div className="navbar-item">
-                                    <Link to="/clientes" className="button is-link">Ventas y clientes</Link>
+                                    <Link onClick={this.closeBurger} to="/clientes" className="button is-link">Ventas y clientes</Link>
                                 </div>
                                 <div className="navbar-item">
-                                    <Link to="/ventas-individuales" className="button is-link">Ventas individuales</Link>
+                                    <Link onClick={this.closeBurger} to="/ventas-individuales" className="button is-link">Ventas individuales</Link>
                                 </div>
                                 <div className="navbar-item">
-                                    <Link to="/" className="button is-link">Ver guía</Link>
+                                    <Link onClick={this.closeBurger} to="/" className="button is-link">Ver guía</Link>
                                 </div>
                             </div>
                             <div className="navbar-end">
                                 <div className="navbar-item">
                                     <div className="buttons">
-                                        <Link to="/editar-cuenta" className="button is-primary is-outlined">
+                                        <Link onClick={this.closeBurger} to="/editar-cuenta" className="button is-primary is-outlined">
                                             Editar cuenta
                                     </Link>
                                         <LogoutButton />
