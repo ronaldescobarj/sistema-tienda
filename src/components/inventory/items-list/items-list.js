@@ -247,7 +247,7 @@ class ItemsListTableBase extends Component {
                     </div>
                 </div>
                 <div className="columns is-mobile is-centered">
-                    <div className="column is-four-fifths">
+                    <div style={{ overflowX: 'auto' }} className="column is-four-fifths">
                         <table className="table is-striped is-fullwidth">
                             <thead>
                                 <tr className="is-selected is-link">
