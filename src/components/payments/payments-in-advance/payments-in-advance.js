@@ -83,7 +83,7 @@ class PaymentsInAdvanceTableBase extends Component {
     calculateTotal(payments, parameter) {
         let total = 0;
         payments.forEach(payment => {
-            total += parseInt(payment[parameter]);
+            total += parseFloat(payment[parameter]);
         })
         return total;
     }
@@ -237,7 +237,7 @@ class PaymentsInAdvanceTableBase extends Component {
                                                 onChange={this.modifyStateOfPayments}>
                                                 <option value="numberOfPayment">Numero de pago</option>
                                                 <option value="date">Fecha</option>
-                                                <option value="amountPaid">Cantidad pagada</option>
+                                                <option value="amountPaidInBolivianos">Cantidad pagada</option>
                                             </select>
                                         </div>
                                     </div>
