@@ -65,7 +65,7 @@ class SalesRecordTableBase extends Component {
                 let sale = doc.data();
                 sale["_id"] = doc.id;
                 sales.push(sale);
-                totalGiven += parseInt(sale.amountGiven);
+                totalGiven += parseInt(sale.totalGiven);
                 totalInBolivianos += parseFloat(sale.totalToPayInBolivianos);
                 totalInSoles += parseFloat(sale.totalToPayInSoles);
             });
@@ -103,7 +103,7 @@ class SalesRecordTableBase extends Component {
         let { allSales, parameterToSortBy, sortDirection, searchFilter } = this.state;
         let filteredSales = this.filterSales(searchFilter, allSales);
         let filteredAndSortedSales = this.sortSales(filteredSales, parameterToSortBy, sortDirection);
-        let totalGiven = this.calculateTotal(filteredAndSortedSales, "amountGiven");
+        let totalGiven = this.calculateTotal(filteredAndSortedSales, "totalGiven");
         let totalInBolivianos = this.calculateTotal(filteredAndSortedSales, "totalToPayInBolivianos");
         let totalInSoles = this.calculateTotal(filteredAndSortedSales, "totalToPayInSoles");
         this.setState({ filteredAndSortedSales, totalGiven, totalInBolivianos, totalInSoles });
@@ -325,10 +325,10 @@ class SalesRecordTableBase extends Component {
                                 <tr>
                                     <th></th>
                                     <th></th>
+                                    <th></th>
+                                    <th></th>
                                     <th>Total</th>
                                     <th>{totalGiven}</th>
-                                    <th></th>
-                                    <th></th>
                                     <th></th>
                                     <th></th>
                                     <th>Total</th>
