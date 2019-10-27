@@ -9,6 +9,8 @@ import parseDate from '../../../utils/date-parser';
 const INITIAL_STATE = {
     allSales: [],
     filteredAndSortedSales: [],
+    totalAmountGiven: 0,
+    totalAmountBorrowed: 0,
     totalGiven: 0,
     totalInBolivianos: 0,
     totalInSoles: 0,
@@ -58,13 +60,15 @@ class SalesRecordTableBase extends Component {
 
     async getData() {
         let sales = [];
-        let totalGiven = 0, totalInBolivianos = 0, totalInSoles = 0;
+        let totalAmountGiven = 0, totalAmountBorrowed = 0, totalGiven = 0, totalInBolivianos = 0, totalInSoles = 0;
         let response = await this.props.firebase.getSalesByParameter("customerId", this.props.customerId);
         if (!response.empty) {
             response.forEach(doc => {
                 let sale = doc.data();
                 sale["_id"] = doc.id;
                 sales.push(sale);
+                totalAmountGiven += parseInt(sale.amountGiven);
+                totalAmountBorrowed += parseInt(sale.amountBorrowed);
                 totalGiven += parseInt(sale.totalGiven);
                 totalInBolivianos += parseFloat(sale.totalToPayInBolivianos);
                 totalInSoles += parseFloat(sale.totalToPayInSoles);
@@ -73,7 +77,7 @@ class SalesRecordTableBase extends Component {
             this.setState({
                 allSales: sales,
                 filteredAndSortedSales: sales,
-                totalGiven, totalInBolivianos, totalInSoles,
+                totalAmountGiven, totalAmountBorrowed, totalGiven, totalInBolivianos, totalInSoles,
                 isLoading: false
             });
         }
@@ -103,10 +107,13 @@ class SalesRecordTableBase extends Component {
         let { allSales, parameterToSortBy, sortDirection, searchFilter } = this.state;
         let filteredSales = this.filterSales(searchFilter, allSales);
         let filteredAndSortedSales = this.sortSales(filteredSales, parameterToSortBy, sortDirection);
+        let totalAmountGiven = this.calculateTotal(filteredAndSortedSales, "amountGiven");
+        let totalAmountBorrowed = this.calculateTotal(filteredAndSortedSales, "amountBorrowed");
         let totalGiven = this.calculateTotal(filteredAndSortedSales, "totalGiven");
         let totalInBolivianos = this.calculateTotal(filteredAndSortedSales, "totalToPayInBolivianos");
         let totalInSoles = this.calculateTotal(filteredAndSortedSales, "totalToPayInSoles");
-        this.setState({ filteredAndSortedSales, totalGiven, totalInBolivianos, totalInSoles });
+        this.setState({ filteredAndSortedSales, totalAmountGiven, totalAmountBorrowed,
+            totalGiven, totalInBolivianos, totalInSoles });
     }
 
     filterSales(searchTerm, salesList) {
@@ -150,11 +157,13 @@ class SalesRecordTableBase extends Component {
         allSales = allSales.filter(element => element._id !== idToDelete);
         let filteredSales = this.filterSales(searchFilter, allSales);
         let filteredAndSortedSales = this.sortSales(filteredSales, parameterToSortBy, sortDirection);
-        let totalGiven = this.calculateTotal(filteredAndSortedSales, "amountGiven");
+        let totalAmountGiven = this.calculateTotal(filteredAndSortedSales, "amountGiven");
+        let totalAmountBorrowed = this.calculateTotal(filteredAndSortedSales, "amountBorrowed");
+        let totalGiven = this.calculateTotal(filteredAndSortedSales, "totalGiven");
         let totalInBolivianos = this.calculateTotal(filteredAndSortedSales, "totalToPayInBolivianos");
         let totalInSoles = this.calculateTotal(filteredAndSortedSales, "totalToPayInSoles");
         await this.setState({
-            allSales, filteredAndSortedSales, totalGiven, totalInBolivianos, totalInSoles,
+            allSales, filteredAndSortedSales, totalAmountGiven, totalAmountBorrowed, totalGiven, totalInBolivianos, totalInSoles,
             isDeleting: false,
             message: response.data.error ? response.data.error : ''
         });
@@ -226,9 +235,9 @@ class SalesRecordTableBase extends Component {
     }
 
     render() {
-        const { totalGiven, totalInBolivianos, totalInSoles, modalClass, parameterToSortBy,
-            sortDirection, searchFilter, isLoading, isDeleting, noSales, shouldUpdateInventory,
-        message } = this.state;
+        const { totalAmountGiven, totalAmountBorrowed, totalGiven, totalInBolivianos, totalInSoles,
+            modalClass, parameterToSortBy, sortDirection, searchFilter, isLoading, isDeleting, noSales,
+            shouldUpdateInventory, message } = this.state;
         if (isLoading) {
             return (
                 <div>
@@ -325,9 +334,9 @@ class SalesRecordTableBase extends Component {
                                 <tr>
                                     <th></th>
                                     <th></th>
-                                    <th></th>
-                                    <th></th>
                                     <th>Total</th>
+                                    <th>{totalAmountGiven}</th>
+                                    <th>{totalAmountBorrowed}</th>
                                     <th>{totalGiven}</th>
                                     <th></th>
                                     <th></th>
