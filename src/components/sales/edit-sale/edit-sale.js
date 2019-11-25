@@ -3,6 +3,7 @@ import { withFirebase } from '../../../providers/firebase';
 import { Link, withRouter } from "react-router-dom";
 import { withAuthorization } from '../../../providers/session';
 import axios from 'axios';
+import { convertToBolivianos, convertToSoles } from '../../../utils/money-convertor';
 
 const INITIAL_STATE = {
     date: '',
@@ -142,23 +143,15 @@ class EditSaleFormBase extends Component {
         this.setState({ selectedColor: color, color: color.color });
     }
 
-    convertToSoles(price) {
-        return price * 0.49;
-    }
-
-    convertToBolivianos(price) {
-        return price * 2.05;
-    }
-
     async modifyPrices(event) {
         let priceInBolivianos, priceInSoles;
         if (event.target.name === "priceInBolivianos") {
             priceInBolivianos = event.target.value;
-            priceInSoles = this.convertToSoles(priceInBolivianos).toFixed(2);
+            priceInSoles = convertToSoles(priceInBolivianos).toFixed(2);
         }
         else {
             priceInSoles = event.target.value;
-            priceInBolivianos = this.convertToBolivianos(priceInSoles).toFixed(2);
+            priceInBolivianos = convertToBolivianos(priceInSoles).toFixed(2);
         }
         await this.setState({ priceInBolivianos, priceInSoles });
         this.recalculateTotal();

@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import { withFirebase } from '../../../providers/firebase';
 import { Link, withRouter } from "react-router-dom";
 import { withAuthorization } from '../../../providers/session';
+import { convertToBolivianos, convertToSoles } from '../../../utils/money-convertor';
 
 const INITIAL_STATE = {
     date: '',
@@ -60,23 +61,15 @@ class AddPaymentFormBase extends Component {
         this.setState({ [event.target.name]: value });
     };
 
-    convertToSoles(price) {
-        return price * 0.49;
-    }
-
-    convertToBolivianos(price) {
-        return price * 2.05;
-    }
-
     modifyPaymentAmounts(event) {
         let amountPaidInBolivianos, amountPaidInSoles;
         if (event.target.name === "amountPaidInBolivianos") {
             amountPaidInBolivianos = event.target.value;
-            amountPaidInSoles = this.convertToSoles(amountPaidInBolivianos).toFixed(2);
+            amountPaidInSoles = convertToSoles(amountPaidInBolivianos).toFixed(2);
         }
         else {
             amountPaidInSoles = event.target.value;
-            amountPaidInBolivianos = this.convertToBolivianos(amountPaidInSoles).toFixed(2);
+            amountPaidInBolivianos = convertToBolivianos(amountPaidInSoles).toFixed(2);
         }
         this.setState({ amountPaidInBolivianos, amountPaidInSoles });
     }
